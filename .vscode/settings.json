@@ -1,0 +1,24 @@
+{
+	"editor.formatOnSave": true,
+	"editor.codeActionsOnSave": {
+		"source.fixAll": "explicit",
+		"source.fixAll.biome": "explicit",
+		"source.organizeImports.biome": "explicit"
+	},
+	"[javascript][typescript][json][jsonc]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[github-actions-workflow][markdown][xml][yaml]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"files.associations": {
+		"*.env": "dotenv"
+	},
+
+	"files.exclude": {
+		"**/.env": false,
+		"**/node_modules": true,
+		"**/dist": true,
+		"**/coverage": true
+	}
+}

@@ -1,0 +1,13 @@
+# Cursor ignore file
+# Allow .env files to be shown
+!.env
+!config.env
+!env.example
+
+# Ignore build and cache files
+node_modules/
+dist/
+coverage/
+.git/
+.history/
+pnpm-lock.yaml
