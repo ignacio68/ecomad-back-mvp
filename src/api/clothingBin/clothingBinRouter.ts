@@ -4,6 +4,7 @@ import {
   getClothingBinsByDistrictController,
   getClothingBinsCountController,
   getClothingBinsNearbyController,
+  loadClothingBinsDataController,
 } from "./clothingBinController";
 
 const router: Router = express.Router();
@@ -20,5 +21,8 @@ router.get("/district/:district", getClothingBinsByDistrictController);
 // GET /api/clothing-bins/nearby - Obtener contenedores cercanos
 // Query params: lat, lng, radius (opcional, default: 5km)
 router.get("/nearby", getClothingBinsNearbyController);
+
+// POST /api/clothing-bins/load-data - Cargar datos desde CSV (temporal)
+router.post("/load-data", loadClothingBinsDataController);
 
 export default router;

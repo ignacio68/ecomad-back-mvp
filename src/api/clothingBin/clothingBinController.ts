@@ -5,7 +5,11 @@ import {
   getClothingBinsByDistrict,
   getClothingBinsCount,
   getClothingBinsNearby,
+  insertClothingBins,
+  clearClothingBins,
 } from "./clothingBinService";
+import { clothingBinSchema } from "./clothingBinSchema";
+import { validateCSV } from "../../common/utils/validateCSV";
 
 export const getClothingBins: RequestHandler = async (
   req: Request,
@@ -131,5 +135,82 @@ export const getClothingBinsCountController: RequestHandler = async (
       null
     );
     res.status(response.statusCode).json(response);
+  }
+};
+
+export const loadClothingBinsDataController: RequestHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const CSV_URL =
+      "https://datos.madrid.es/egob/catalogo/204410-1-contenedores-ropa.csv";
+
+    console.log("🔄 Descargando CSV desde:", CSV_URL);
+
+    const fetchResponse = await fetch(CSV_URL, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; EcoMAD-Back/1.0)",
+      },
+    });
+
+    if (!fetchResponse.ok) {
+      throw new Error(
+        `Failed to download CSV: ${fetchResponse.status} ${fetchResponse.statusText}`
+      );
+    }
+
+    const csvText = await fetchResponse.text();
+    console.log("✅ CSV descargado, tamaño:", csvText.length, "caracteres");
+
+    console.log("🔄 Validando CSV...");
+    const { valid, invalid } = await validateCSV(csvText, clothingBinSchema, {
+      delimiter: ";",
+      skipEmptyLines: true,
+    });
+
+    console.log("✅ Valid records:", valid.length);
+    console.log("❌ Invalid records:", invalid.length);
+
+    if (valid.length === 0) {
+      const serviceResponse = ServiceResponse.failure(
+        "No se encontraron registros válidos en el CSV",
+        null
+      );
+      res.status(serviceResponse.statusCode).json(serviceResponse);
+      return;
+    }
+
+    // Limpiar tabla existente
+    const clearResult = await clearClothingBins();
+    if (!clearResult.success) {
+      const serviceResponse = ServiceResponse.failure(
+        "Error al limpiar tabla existente",
+        clearResult.error
+      );
+      res.status(serviceResponse.statusCode).json(serviceResponse);
+      return;
+    }
+
+    // Insertar nuevos datos
+    const insertResult = await insertClothingBins(valid);
+
+    const serviceResponse = ServiceResponse.success(
+      "Datos de contenedores de ropa cargados exitosamente",
+      {
+        inserted: insertResult.success,
+        errors: insertResult.errors.length,
+        totalRecords: valid.length,
+      }
+    );
+
+    res.status(serviceResponse.statusCode).json(serviceResponse);
+  } catch (error) {
+    console.error("Error en loadClothingBinsData:", error);
+    const serviceResponse = ServiceResponse.failure(
+      "Error interno del servidor al cargar datos",
+      error instanceof Error ? error.message : "Error desconocido"
+    );
+    res.status(serviceResponse.statusCode).json(serviceResponse);
   }
 };
