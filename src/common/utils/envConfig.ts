@@ -19,6 +19,10 @@ const envSchema = z.object({
     .default(1000),
 
   COMMON_RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(1000),
+
+  // Nearby defaults
+  MAX_RADIUS_KM: z.coerce.number().positive().default(5),
+  DEFAULT_LIMIT: z.coerce.number().int().positive().default(1000),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
