@@ -8,8 +8,8 @@ import {
   getClothingBinsByNeighborhood,
   getClothingBinsCount,
   getClothingBinsNearby,
-  getDistrictAggregates,
-  getNeighborhoodAggregates,
+  getDistrictCounts,
+  getNeighborhoodCounts,
   insertClothingBins,
   clearClothingBins,
 } from "./clothingBinService";
@@ -223,40 +223,28 @@ export const getClothingBinsCountController: RequestHandler = async (
   }
 };
 
-export const getDistrictAggregatesController: RequestHandler = async (
+// Nuevos controladores para COUNT directo
+export const getDistrictCountsController: RequestHandler = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const { minLat, minLng, maxLat, maxLng } = req.query;
-    if (!minLat || !minLng || !maxLat || !maxLng) {
-      const response = ServiceResponse.failure(
-        "Parámetros bbox requeridos: minLat,minLng,maxLat,maxLng",
-        null
-      );
-      res.status(response.statusCode).json(response);
-      return;
-    }
-    const data = await getDistrictAggregates(
-      parseFloat(minLat as string),
-      parseFloat(minLng as string),
-      parseFloat(maxLat as string),
-      parseFloat(maxLng as string)
-    );
+    const data = await getDistrictCounts();
 
     const response = ServiceResponse.success(
-      "Agregación por distrito obtenida",
+      "Conteos por distrito obtenidos exitosamente",
       data
     );
+
     res
       .setHeader(
         "Cache-Control",
-        "public, max-age=120, stale-while-revalidate=300"
+        "public, max-age=300, stale-while-revalidate=600"
       )
       .status(response.statusCode)
       .json(response);
   } catch (error) {
-    console.error("Error en getDistrictAggregatesController:", error);
+    console.error("Error en getDistrictCountsController:", error);
     const response = ServiceResponse.failure(
       "Error interno del servidor",
       null
@@ -265,40 +253,27 @@ export const getDistrictAggregatesController: RequestHandler = async (
   }
 };
 
-export const getNeighborhoodAggregatesController: RequestHandler = async (
+export const getNeighborhoodCountsController: RequestHandler = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const { minLat, minLng, maxLat, maxLng } = req.query;
-    if (!minLat || !minLng || !maxLat || !maxLng) {
-      const response = ServiceResponse.failure(
-        "Parámetros bbox requeridos: minLat,minLng,maxLat,maxLng",
-        null
-      );
-      res.status(response.statusCode).json(response);
-      return;
-    }
-    const data = await getNeighborhoodAggregates(
-      parseFloat(minLat as string),
-      parseFloat(minLng as string),
-      parseFloat(maxLat as string),
-      parseFloat(maxLng as string)
-    );
+    const data = await getNeighborhoodCounts();
 
     const response = ServiceResponse.success(
-      "Agregación por barrio obtenida",
+      "Conteos por barrio obtenidos exitosamente",
       data
     );
+
     res
       .setHeader(
         "Cache-Control",
-        "public, max-age=180, stale-while-revalidate=600"
+        "public, max-age=300, stale-while-revalidate=600"
       )
       .status(response.statusCode)
       .json(response);
   } catch (error) {
-    console.error("Error en getNeighborhoodAggregatesController:", error);
+    console.error("Error en getNeighborhoodCountsController:", error);
     const response = ServiceResponse.failure(
       "Error interno del servidor",
       null

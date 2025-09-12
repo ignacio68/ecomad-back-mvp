@@ -37,12 +37,10 @@ export const insertClothingBins = async (
     const batch = transformedBins.slice(i, i + batchSize);
 
     try {
-      const { data, error } = await supabase
-        .from("clothing_bins")
-        .upsert(batch, {
-          onConflict: "direccion_completa,distrito,barrio",
-          ignoreDuplicates: false,
-        });
+      const { error } = await supabase.from("clothing_bins").upsert(batch, {
+        onConflict: "direccion_completa,distrito,barrio",
+        ignoreDuplicates: false,
+      });
 
       if (error) {
         console.error(
@@ -258,23 +256,9 @@ export const getClothingBinsNearby = async (
   }
 };
 
-export const getDistrictAggregates = async (
-  minLat: number,
-  minLng: number,
-  maxLat: number,
-  maxLng: number
-) =>
-  ClothingBinRepository.getDistrictAggregates(minLat, minLng, maxLat, maxLng);
+// Nuevos servicios para COUNT directo
+export const getDistrictCounts = async () =>
+  ClothingBinRepository.getDistrictCounts();
 
-export const getNeighborhoodAggregates = async (
-  minLat: number,
-  minLng: number,
-  maxLat: number,
-  maxLng: number
-) =>
-  ClothingBinRepository.getNeighborhoodAggregates(
-    minLat,
-    minLng,
-    maxLat,
-    maxLng
-  );
+export const getNeighborhoodCounts = async () =>
+  ClothingBinRepository.getNeighborhoodCounts();

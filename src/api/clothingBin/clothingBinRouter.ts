@@ -7,8 +7,8 @@ import {
   getClothingBinsCountController,
   getClothingBinsNearbyController,
   loadClothingBinsDataController,
-  getDistrictAggregatesController,
-  getNeighborhoodAggregatesController,
+  getDistrictCountsController,
+  getNeighborhoodCountsController,
   debugClothingBinsController,
 } from "./clothingBinController";
 
@@ -34,11 +34,11 @@ router.get(
 // Query params: lat, lng, radius (opcional, default: 5km)
 router.get("/nearby", getClothingBinsNearbyController);
 
-// GET /api/clothing-bins/aggregate/district - Agregación por distrito dentro de un bbox
-router.get("/aggregate/district", getDistrictAggregatesController);
+// GET /api/clothing-bins/counts/district - Conteos por distrito (sin filtrar por bounds)
+router.get("/counts/district", getDistrictCountsController);
 
-// GET /api/clothing-bins/aggregate/neighborhood - Agregación por barrio dentro de un bbox
-router.get("/aggregate/neighborhood", getNeighborhoodAggregatesController);
+// GET /api/clothing-bins/counts/neighborhood - Conteos por barrio (sin filtrar por bounds)
+router.get("/counts/neighborhood", getNeighborhoodCountsController);
 
 // POST /api/clothing-bins/load-data - Cargar datos desde CSV (temporal)
 router.post("/load-data", loadClothingBinsDataController);

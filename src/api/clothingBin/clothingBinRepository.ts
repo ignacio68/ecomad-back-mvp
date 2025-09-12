@@ -27,116 +27,6 @@ export class ClothingBinRepository {
     }
   }
 
-  static async getDistrictAggregates(
-    minLat: number,
-    minLng: number,
-    maxLat: number,
-    maxLng: number
-  ): Promise<
-    Array<{
-      distrito: string;
-      count: number;
-      centroid: { lat: number; lng: number };
-    }>
-  > {
-    try {
-      const { data, error } = await supabase
-        .from("clothing_bins")
-        .select("distrito, latitud, longitud")
-        .gte("latitud", minLat)
-        .lte("latitud", maxLat)
-        .gte("longitud", minLng)
-        .lte("longitud", maxLng);
-
-      if (error) {
-        console.error("Error en getDistrictAggregates:", error);
-        throw error;
-      }
-
-      const groups = new Map<
-        string,
-        { count: number; sumLat: number; sumLng: number }
-      >();
-      for (const row of data || []) {
-        const key = row.distrito as string;
-        const g = groups.get(key) || { count: 0, sumLat: 0, sumLng: 0 };
-        g.count += 1;
-        g.sumLat += Number(row.latitud);
-        g.sumLng += Number(row.longitud);
-        groups.set(key, g);
-      }
-      return Array.from(groups.entries()).map(([distrito, g]) => ({
-        distrito,
-        count: g.count,
-        centroid: { lat: g.sumLat / g.count, lng: g.sumLng / g.count },
-      }));
-    } catch (error) {
-      console.error("Error inesperado en getDistrictAggregates:", error);
-      throw error;
-    }
-  }
-
-  static async getNeighborhoodAggregates(
-    minLat: number,
-    minLng: number,
-    maxLat: number,
-    maxLng: number
-  ): Promise<
-    Array<{
-      distrito: string;
-      barrio: string;
-      count: number;
-      centroid: { lat: number; lng: number };
-    }>
-  > {
-    try {
-      const { data, error } = await supabase
-        .from("clothing_bins")
-        .select("distrito, barrio, latitud, longitud")
-        .gte("latitud", minLat)
-        .lte("latitud", maxLat)
-        .gte("longitud", minLng)
-        .lte("longitud", maxLng);
-
-      if (error) {
-        console.error("Error en getNeighborhoodAggregates:", error);
-        throw error;
-      }
-
-      const groups = new Map<
-        string,
-        { distrito: string; count: number; sumLat: number; sumLng: number }
-      >();
-      for (const row of data || []) {
-        const barrio = row.barrio as string;
-        const distrito = row.distrito as string;
-        const key = `${distrito}::${barrio}`;
-        const g = groups.get(key) || {
-          distrito,
-          count: 0,
-          sumLat: 0,
-          sumLng: 0,
-        };
-        g.count += 1;
-        g.sumLat += Number(row.latitud);
-        g.sumLng += Number(row.longitud);
-        groups.set(key, g);
-      }
-      return Array.from(groups.entries()).map(([key, g]) => {
-        const [, barrio] = key.split("::");
-        return {
-          distrito: g.distrito,
-          barrio,
-          count: g.count,
-          centroid: { lat: g.sumLat / g.count, lng: g.sumLng / g.count },
-        };
-      });
-    } catch (error) {
-      console.error("Error inesperado en getNeighborhoodAggregates:", error);
-      throw error;
-    }
-  }
-
   /**
    * Obtener contenedores por distrito
    */
@@ -302,6 +192,96 @@ export class ClothingBinRepository {
         "Error inesperado en ClothingBinRepository.getDistricts:",
         error
       );
+      throw error;
+    }
+  }
+
+  // Nuevos métodos para COUNT directo sin filtrar por bounds
+  static async getDistrictCounts(): Promise<
+    Array<{
+      distrito: string;
+      count: number;
+      centroid: { lat: number; lng: number };
+    }>
+  > {
+    try {
+      const { data, error } = await supabase
+        .from("clothing_bins")
+        .select("distrito, latitud, longitud");
+
+      if (error) {
+        console.error("Error en getDistrictCounts:", error);
+        throw error;
+      }
+
+      const groups = new Map<
+        string,
+        { count: number; sumLat: number; sumLng: number }
+      >();
+
+      for (const row of data || []) {
+        const key = row.distrito as string;
+        const g = groups.get(key) || { count: 0, sumLat: 0, sumLng: 0 };
+        g.count += 1;
+        g.sumLat += Number(row.latitud);
+        g.sumLng += Number(row.longitud);
+        groups.set(key, g);
+      }
+
+      return Array.from(groups.entries()).map(([distrito, g]) => ({
+        distrito,
+        count: g.count,
+        centroid: { lat: g.sumLat / g.count, lng: g.sumLng / g.count },
+      }));
+    } catch (error) {
+      console.error("Error inesperado en getDistrictCounts:", error);
+      throw error;
+    }
+  }
+
+  static async getNeighborhoodCounts(): Promise<
+    Array<{
+      distrito: string;
+      barrio: string;
+      count: number;
+      centroid: { lat: number; lng: number };
+    }>
+  > {
+    try {
+      const { data, error } = await supabase
+        .from("clothing_bins")
+        .select("distrito, barrio, latitud, longitud");
+
+      if (error) {
+        console.error("Error en getNeighborhoodCounts:", error);
+        throw error;
+      }
+
+      const groups = new Map<
+        string,
+        { count: number; sumLat: number; sumLng: number }
+      >();
+
+      for (const row of data || []) {
+        const key = `${row.distrito}-${row.barrio}`;
+        const g = groups.get(key) || { count: 0, sumLat: 0, sumLng: 0 };
+        g.count += 1;
+        g.sumLat += Number(row.latitud);
+        g.sumLng += Number(row.longitud);
+        groups.set(key, g);
+      }
+
+      return Array.from(groups.entries()).map(([key, g]) => {
+        const [distrito, barrio] = key.split("-");
+        return {
+          distrito,
+          barrio,
+          count: g.count,
+          centroid: { lat: g.sumLat / g.count, lng: g.sumLng / g.count },
+        };
+      });
+    } catch (error) {
+      console.error("Error inesperado en getNeighborhoodCounts:", error);
       throw error;
     }
   }
