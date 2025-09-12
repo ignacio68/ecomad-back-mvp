@@ -221,10 +221,28 @@ export class ClothingBinRepository {
 
       for (const row of data || []) {
         const key = row.distrito as string;
+        const lat = Number(row.latitud);
+        const lng = Number(row.longitud);
+
+        // Validar que las coordenadas estén en el área de Madrid
+        if (
+          isNaN(lat) ||
+          isNaN(lng) ||
+          lat < 40.2 ||
+          lat > 40.6 ||
+          lng < -3.9 ||
+          lng > -3.5
+        ) {
+          console.warn(
+            `⚠️ Skipping invalid coordinates for ${key}: lat=${lat}, lng=${lng}`
+          );
+          continue;
+        }
+
         const g = groups.get(key) || { count: 0, sumLat: 0, sumLng: 0 };
         g.count += 1;
-        g.sumLat += Number(row.latitud);
-        g.sumLng += Number(row.longitud);
+        g.sumLat += lat;
+        g.sumLng += lng;
         groups.set(key, g);
       }
 
@@ -264,10 +282,28 @@ export class ClothingBinRepository {
 
       for (const row of data || []) {
         const key = `${row.distrito}-${row.barrio}`;
+        const lat = Number(row.latitud);
+        const lng = Number(row.longitud);
+
+        // Validar que las coordenadas estén en el área de Madrid
+        if (
+          isNaN(lat) ||
+          isNaN(lng) ||
+          lat < 40.2 ||
+          lat > 40.6 ||
+          lng < -3.9 ||
+          lng > -3.5
+        ) {
+          console.warn(
+            `⚠️ Skipping invalid coordinates for ${key}: lat=${lat}, lng=${lng}`
+          );
+          continue;
+        }
+
         const g = groups.get(key) || { count: 0, sumLat: 0, sumLng: 0 };
         g.count += 1;
-        g.sumLat += Number(row.latitud);
-        g.sumLng += Number(row.longitud);
+        g.sumLat += lat;
+        g.sumLng += lng;
         groups.set(key, g);
       }
 
