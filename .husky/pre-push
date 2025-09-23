@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Ejecutar todos los tests con cobertura
+pnpm test:cov
+
+# Verificar que el build funciona
+pnpm build

@@ -1,119 +1,303 @@
-# 🚀 Express TypeScript Boilerplate 2025
+# EcoMAD Backend MVP
 
-[![CI](https://github.com/edwinhern/express-typescript/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/edwinhern/express-typescript-2024/actions/workflows/ci.yml)
+API REST para la gestión de contenedores de reciclaje en la ciudad de Madrid.
 
-```code
-Hey There! 🙌
-🤾 that ⭐️ button if you like this boilerplate.
+## 🚀 Características
+
+- **Gestión de contenedores**: Obtener información sobre diferentes tipos de contenedores de reciclaje
+- **Búsqueda por ubicación**: Filtrar contenedores por distrito o barrio
+- **Búsqueda por proximidad**: Encontrar contenedores cercanos a una ubicación específica
+- **Estadísticas**: Obtener conteos y estadísticas jerárquicas por distrito y barrio
+- **Cache inteligente**: Respuestas optimizadas con cache headers para mejor rendimiento
+- **API versionada**: Estructura preparada para futuras versiones de la API
+- **Documentación OpenAPI**: Documentación automática con Swagger UI
+
+## 📁 Estructura del Proyecto
+
+```
+src/
+├── app.ts                          # Configuración principal de la aplicación
+├── index.ts                        # Punto de entrada del servidor
+├── api/                            # API REST
+│   ├── apiRouter.ts                # Router principal de la API
+│   ├── v1/                         # Versión 1 de la API
+│   │   ├── v1Router.ts            # Router de la v1
+│   │   └── bins/                   # Módulo de contenedores
+│   │       ├── controllers/        # Controladores
+│   │       ├── middleware/         # Middleware específico
+│   │       ├── routes/             # Rutas
+│   │       ├── schemas/            # Esquemas Zod
+│   │       ├── services/           # Lógica de negocio
+│   │       ├── types/              # Tipos TypeScript
+│   │       └── scripts/            # Scripts de utilidad
+│   └── common/                     # Utilidades comunes de la API
+│       ├── lib/                    # Cliente Supabase
+│       └── utils/                  # Utilidades (geo, validación, etc.)
+├── api-docs/                       # Documentación OpenAPI
+│   ├── openAPIDocumentGenerator.ts # Generador de documentación
+│   ├── openAPIRouter.ts            # Router de Swagger UI
+│   └── responseBuilders.ts         # Constructores de respuestas
+└── shared/                         # Utilidades compartidas
+    ├── lib/                        # Configuración OpenAPI
+    ├── middleware/                 # Middleware global
+    ├── models/                     # Modelos de respuesta
+    └── utils/                      # Utilidades generales
 ```
 
-## 🌟 Introduction
+## 🛠️ Tecnologías
 
-Welcome to Express TypeScript Boilerplate 2025 – a simple and ready-to-use starting point for building backend web services with Express.js and TypeScript.
+- **Node.js** + **TypeScript**
+- **Express.js** - Framework web
+- **Supabase** - Base de datos y autenticación
+- **Zod** - Validación de esquemas
+- **OpenAPI 3.0** - Documentación de API
+- **Swagger UI** - Interfaz de documentación
+- **Helmet** - Seguridad HTTP
+- **CORS** - Cross-Origin Resource Sharing
+- **Rate Limiting** - Control de velocidad de requests
 
-## 💡 Why We Made This
+## 📦 Instalación
 
-This starter kit helps you:
+### Prerrequisitos
 
-- ✨ Start new projects faster
-- 📊 Write clean, consistent code
-- ⚡ Build things quickly
-- 🛡️ Follow best practices for security and testing
+- Node.js 18+
+- npm o yarn
+- Cuenta de Supabase
 
-## 🚀 What's Included
+### Configuración
 
-- 📁 Well-organized folders: Files grouped by feature so you can find things easily
-- 💨 Fast development: Quick code running with `tsx` and error checking with `tsc`
-- 🌐 Latest Node.js: Uses the newest stable Node.js version from `.tool-versions`
-- 🔧 Safe settings: Environment settings checked with Zod to prevent errors
-- 🔗 Short import paths: Clean code with easy imports using path shortcuts
-- 🔄 Auto-updates: Keeps dependencies up-to-date with Renovate
-- 🔒 Better security: Built-in protection with Helmet and CORS settings
-- 📊 Easy tracking: Built-in logging with `pino-http`
-- 🧪 Ready-to-test: Testing tools with Vitest and Supertest already set up
-- ✅ Clean code: Consistent coding style with `Biomejs`
-- 📃 Standard responses: Unified API responses using `ServiceResponse`
-- 🐳 Easy deployment: Ready for Docker containers
-- 📝 Input checking: Request validation using Zod
-- 🧩 API browser: Interactive API docs with Swagger UI
+1. **Clonar el repositorio**
 
-## 🛠️ Getting Started
+   ```bash
+   git clone <repository-url>
+   cd ecomad-back-mvp
+   ```
 
-### Video Demo
+2. **Instalar dependencias**
 
-For a visual guide, watch the [video demo](https://github.com/user-attachments/assets/b1698dac-d582-45a0-8d61-31131732b74e) to see the setup and running of the project.
+   ```bash
+   npm install
+   ```
 
-### Step-by-Step Guide
+3. **Configurar variables de entorno**
 
-#### Step 1: 🚀 Initial Setup
+   ```bash
+   cp env.example config.env
+   ```
 
-- Clone the repository: `git clone https://github.com/edwinhern/express-typescript.git`
-- Navigate: `cd express-typescript`
-- Install dependencies: `pnpm install`
+   Editar `config.env` con tus credenciales de Supabase:
 
-#### Step 2: ⚙️ Environment Configuration
+   ```env
+   SUPABASE_URL=your_supabase_url
+   SUPABASE_ANON_KEY=your_supabase_anon_key
+   NODE_ENV=development
+   PORT=8080
+   HOST=localhost
+   CORS_ORIGIN=http://localhost:3000
+   ```
 
-- Create `.env`: Copy `.env.template` to `.env`
-- Update `.env`: Fill in necessary environment variables
+4. **Configurar base de datos**
+   - Ejecutar el script SQL en `supabase-schema.sql`
+   - O usar el setup documentado en `SUPABASE_SETUP.md`
 
-#### Step 3: 🏃‍♂️ Running the Project
+## 🚀 Ejecución
 
-- Development Mode: `pnpm start:dev`
-- Building: `pnpm build`
-- Production Mode: Set `NODE_ENV="production"` in `.env` then `pnpm build && pnpm start:prod`
+### Desarrollo
 
-## 🤝 Feedback and Contributions
-
-We'd love to hear your feedback and suggestions for further improvements. Feel free to contribute and join us in making backend development cleaner and faster!
-
-🎉 Happy coding!
-
-## 📁 Folder Structure
-
-```code
-├── biome.json
-├── Dockerfile
-├── LICENSE
-├── package.json
-├── pnpm-lock.yaml
-├── README.md
-├── src
-│   ├── api
-│   │   ├── healthCheck
-│   │   │   ├── __tests__
-│   │   │   │   └── healthCheckRouter.test.ts
-│   │   │   └── healthCheckRouter.ts
-│   │   └── user
-│   │       ├── __tests__
-│   │       │   ├── userRouter.test.ts
-│   │       │   └── userService.test.ts
-│   │       ├── userController.ts
-│   │       ├── userModel.ts
-│   │       ├── userRepository.ts
-│   │       ├── userRouter.ts
-│   │       └── userService.ts
-│   ├── api-docs
-│   │   ├── __tests__
-│   │   │   └── openAPIRouter.test.ts
-│   │   ├── openAPIDocumentGenerator.ts
-│   │   ├── openAPIResponseBuilders.ts
-│   │   └── openAPIRouter.ts
-│   ├── common
-│   │   ├── __tests__
-│   │   │   ├── errorHandler.test.ts
-│   │   │   └── requestLogger.test.ts
-│   │   ├── middleware
-│   │   │   ├── errorHandler.ts
-│   │   │   ├── rateLimiter.ts
-│   │   │   └── requestLogger.ts
-│   │   ├── models
-│   │   │   └── serviceResponse.ts
-│   │   └── utils
-│   │       ├── commonValidation.ts
-│   │       ├── envConfig.ts
-│   │       └── httpHandlers.ts
-│   ├── index.ts
-│   └── server.ts
-├── tsconfig.json
-└── vite.config.mts
+```bash
+npm run dev
 ```
+
+### Producción
+
+```bash
+npm run build
+npm start
+```
+
+### Scripts disponibles
+
+```bash
+npm run dev          # Desarrollo con hot reload
+npm run build        # Compilar TypeScript
+npm run start        # Ejecutar en producción
+npm run test         # Ejecutar tests
+npm run test:watch   # Tests en modo watch
+npm run lint         # Linter
+npm run lint:fix     # Linter con auto-fix
+```
+
+## 📚 API Endpoints
+
+### Base URL
+
+```
+http://localhost:8080/api/v1
+```
+
+### Tipos de contenedores soportados
+
+- `clothing_bins` - Contenedores de ropa
+- `oil_bins` - Contenedores de aceite usado
+- `glass_bins` - Contenedores de vidrio
+- `paper_bins` - Contenedores de papel y cartón
+- `plastic_bins` - Contenedores de envases
+- `organic_bins` - Contenedores de residuos orgánicos
+- `other_bins` - Contenedores de resto de residuos
+
+### Endpoints principales
+
+#### 📊 Obtener todos los contenedores
+
+```http
+GET /api/v1/bins/{binType}?page=1&limit=100
+```
+
+#### 📈 Obtener conteo de contenedores
+
+```http
+GET /api/v1/bins/{binType}/count
+```
+
+#### 🗺️ Obtener por ubicación
+
+```http
+GET /api/v1/bins/{binType}/location/{locationType}/{locationValue}
+```
+
+- `locationType`: `district` o `neighborhood`
+- `locationValue`: Nombre del distrito o barrio
+
+#### 📍 Obtener contenedores cercanos
+
+```http
+GET /api/v1/bins/{binType}/nearby?lat=40.4168&lng=-3.7038&radius=5&limit=100
+```
+
+#### 📊 Conteos jerárquicos
+
+```http
+GET /api/v1/bins/{binType}/counts
+```
+
+#### 🔧 Endpoints de administración
+
+```http
+POST /api/v1/bins/{binType}/load-data    # Cargar datos desde CSV
+GET  /api/v1/bins/{binType}/debug        # Debug endpoint
+```
+
+### Health Check
+
+```http
+GET /health
+```
+
+## 📖 Documentación de la API
+
+La documentación completa está disponible en:
+
+- **Swagger UI**: http://localhost:8080/api-docs
+- **OpenAPI JSON**: http://localhost:8080/swagger.json
+
+## 🗄️ Base de Datos
+
+### Estructura de tablas
+
+#### `clothing_bins`
+
+```sql
+CREATE TABLE clothing_bins (
+  id SERIAL PRIMARY KEY,
+  tipo_dato TEXT,
+  lote TEXT,
+  cod_dist TEXT,
+  distrito TEXT,
+  cod_barrio TEXT,
+  barrio TEXT,
+  direccion_completa TEXT,
+  via_clase TEXT,
+  via_par TEXT,
+  via_nombre TEXT,
+  tipo_numero TEXT,
+  numero TEXT,
+  latitud DECIMAL(10,8),
+  longitud DECIMAL(11,8),
+  direccion_completa_ampliada TEXT,
+  mas_informacion TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+## 🔧 Scripts de Utilidad
+
+### Actualizar datos de contenedores
+
+```bash
+# Ejecutar script de actualización
+npm run update-data
+```
+
+El script descarga automáticamente los datos más recientes desde el portal de datos abiertos de Madrid.
+
+## 🧪 Testing
+
+```bash
+# Ejecutar todos los tests
+npm run test
+
+# Tests en modo watch
+npm run test:watch
+
+# Tests con coverage
+npm run test:coverage
+```
+
+## 🔒 Seguridad
+
+- **Rate Limiting**: 100 requests/minuto por IP
+- **CORS**: Configurado para dominios específicos
+- **Helmet**: Headers de seguridad HTTP
+- **Validación**: Todos los inputs validados con Zod
+- **Sanitización**: Caracteres peligrosos filtrados en URLs
+
+## 🚀 Despliegue
+
+### Variables de entorno de producción
+
+```env
+NODE_ENV=production
+PORT=8080
+HOST=0.0.0.0
+CORS_ORIGIN=https://your-frontend-domain.com
+```
+
+### Docker
+
+```bash
+docker build -t ecomad-backend .
+docker run -p 8080:8080 ecomad-backend
+```
+
+## 🤝 Contribución
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## 📝 Licencia
+
+Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
+
+## 📞 Contacto
+
+- **EcoMAD Team** - contact@ecomad.app
+- **Proyecto**: https://ecomad.app
+- **Documentación**: http://localhost:8080/api-docs
+
+---
+
+**Nota**: Este es un MVP (Minimum Viable Product) en desarrollo activo. La API puede cambiar en futuras versiones.
