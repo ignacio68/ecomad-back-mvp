@@ -39,7 +39,11 @@ export const BinSchema = z
 // Schema para conteo
 export const CountSchema = z
 	.object({
-		count: z.number().openapi({ example: 1254 }),
+		success: z.boolean().openapi({ example: true }),
+		message: z.string().openapi({ example: "Conteo de contenedores obtenido exitosamente" }),
+		data: z.object({
+			count: z.number().openapi({ example: 1254 }),
+		}),
 		statusCode: z.number().openapi({ example: 200 }),
 	})
 	.openapi("Count");
@@ -77,20 +81,12 @@ export const PaginationQuerySchema = z
 	})
 	.openapi("PaginationQuery");
 
-// Schema para conteos jerárquicos
+// Schema para conteos jerárquicos (estructura plana)
 export const HierarchyCountSchema = z
 	.object({
-		name: z.string().openapi({ example: "CENTRO", description: "Nombre del distrito" }),
-		count: z.number().openapi({
-			example: 150,
-			description: "Total de contenedores en el distrito",
-		}),
-		neighborhoods: z.array(
-			z.object({
-				name: z.string().openapi({ example: "PALACIO", description: "Nombre del barrio" }),
-				count: z.number().openapi({ example: 25, description: "Contenedores en el barrio" }),
-			}),
-		),
+		distrito: z.string().openapi({ example: "CENTRO", description: "Nombre del distrito" }),
+		barrio: z.string().openapi({ example: "PALACIO", description: "Nombre del barrio" }),
+		count: z.number().openapi({ example: 25, description: "Contenedores en el barrio" }),
 	})
 	.openapi("HierarchyCount");
 
@@ -116,24 +112,29 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 		responses: createApiResponses([
 			{
 				schema: z.object({
+					success: z.boolean().openapi({ example: true }),
+					message: z.string().openapi({ example: "Contenedores obtenidos exitosamente" }),
 					data: z.array(BinSchema),
-					statusCode: z.number(),
+					statusCode: z.number().openapi({ example: 200 }),
 				}),
 				description: "Lista de contenedores obtenida exitosamente",
 				statusCode: StatusCodes.OK,
 			},
 			{
 				schema: z.object({
+					success: z.boolean().openapi({ example: true }),
+					message: z.string().openapi({ example: "No se encontraron contenedores" }),
 					data: z.array(z.any()).openapi({ example: [] }),
-					statusCode: z.number().openapi({ example: 204 }),
+					statusCode: z.number().openapi({ example: 200 }),
 				}),
 				description: "No se encontraron contenedores",
-				statusCode: StatusCodes.NO_CONTENT,
+				statusCode: StatusCodes.OK,
 			},
 			{
 				schema: z.object({
 					success: z.boolean().openapi({ example: false }),
 					message: z.string().openapi({ example: "Tipo de contenedor inválido" }),
+					data: z.null().openapi({ example: null }),
 					statusCode: z.number().openapi({ example: 400 }),
 				}),
 				description: "Tipo de contenedor inválido",
@@ -145,6 +146,7 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 					message: z.string().openapi({
 						example: "Demasiadas solicitudes. Intenta de nuevo más tarde.",
 					}),
+					data: z.null().openapi({ example: null }),
 					statusCode: z.number().openapi({ example: 429 }),
 				}),
 				description: "Demasiadas solicitudes (rate limited)",
@@ -154,6 +156,7 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 				schema: z.object({
 					success: z.boolean().openapi({ example: false }),
 					message: z.string().openapi({ example: "Error interno del servidor" }),
+					data: z.null().openapi({ example: null }),
 					statusCode: z.number().openapi({ example: 500 }),
 				}),
 				description: "Error interno del servidor",
@@ -187,7 +190,9 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 			},
 			{
 				schema: z.object({
-					count: z.number().openapi({ example: 0 }),
+					success: z.boolean().openapi({ example: false }),
+					message: z.string().openapi({ example: "Tipo de contenedor inválido" }),
+					data: z.null().openapi({ example: null }),
 					statusCode: z.number().openapi({ example: 400 }),
 				}),
 				description: "Tipo de contenedor inválido",
@@ -195,7 +200,11 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 			},
 			{
 				schema: z.object({
-					count: z.number().openapi({ example: 0 }),
+					success: z.boolean().openapi({ example: false }),
+					message: z.string().openapi({
+						example: "Demasiadas solicitudes. Intenta de nuevo más tarde.",
+					}),
+					data: z.null().openapi({ example: null }),
 					statusCode: z.number().openapi({ example: 429 }),
 				}),
 				description: "Demasiadas solicitudes (rate limited)",
@@ -203,7 +212,9 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 			},
 			{
 				schema: z.object({
-					count: z.number().openapi({ example: 0 }),
+					success: z.boolean().openapi({ example: false }),
+					message: z.string().openapi({ example: "Error interno del servidor" }),
+					data: z.null().openapi({ example: null }),
 					statusCode: z.number().openapi({ example: 500 }),
 				}),
 				description: "Error interno del servidor",
@@ -241,32 +252,57 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 		responses: createApiResponses([
 			{
 				schema: z.object({
+					success: z.boolean().openapi({ example: true }),
+					message: z.string().openapi({
+						example: "Contenedores de la ubicación obtenidos exitosamente",
+					}),
 					data: z.array(BinSchema),
-					statusCode: z.number(),
+					statusCode: z.number().openapi({ example: 200 }),
 				}),
 				description: "Contenedores de la ubicación obtenidos exitosamente",
 				statusCode: StatusCodes.OK,
 			},
 			{
 				schema: z.object({
-					data: z.array(z.any()),
-					statusCode: z.number(),
+					success: z.boolean().openapi({ example: true }),
+					message: z.string().openapi({
+						example: "No se encontraron contenedores en la ubicación especificada",
+					}),
+					data: z.array(z.any()).openapi({ example: [] }),
+					statusCode: z.number().openapi({ example: 200 }),
 				}),
 				description: "No se encontraron contenedores en la ubicación especificada",
-				statusCode: StatusCodes.NO_CONTENT,
+				statusCode: StatusCodes.OK,
 			},
 			{
-				schema: z.object({}),
+				schema: z.object({
+					success: z.boolean().openapi({ example: false }),
+					message: z.string().openapi({ example: "Parámetros de ubicación inválidos" }),
+					data: z.null().openapi({ example: null }),
+					statusCode: z.number().openapi({ example: 400 }),
+				}),
 				description: "Parámetros inválidos (binType, locationType o locationValue)",
 				statusCode: StatusCodes.BAD_REQUEST,
 			},
 			{
-				schema: z.object({}),
+				schema: z.object({
+					success: z.boolean().openapi({ example: false }),
+					message: z.string().openapi({
+						example: "Demasiadas solicitudes. Intenta de nuevo más tarde.",
+					}),
+					data: z.null().openapi({ example: null }),
+					statusCode: z.number().openapi({ example: 429 }),
+				}),
 				description: "Demasiadas solicitudes (rate limited)",
 				statusCode: StatusCodes.TOO_MANY_REQUESTS,
 			},
 			{
-				schema: z.object({}),
+				schema: z.object({
+					success: z.boolean().openapi({ example: false }),
+					message: z.string().openapi({ example: "Error interno del servidor" }),
+					data: z.null().openapi({ example: null }),
+					statusCode: z.number().openapi({ example: 500 }),
+				}),
 				description: "Error interno del servidor",
 				statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
 			},
@@ -295,27 +331,57 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 		responses: createApiResponses([
 			{
 				schema: z.object({
+					success: z.boolean().openapi({ example: true }),
+					message: z.string().openapi({
+						example: "Contenedores cercanos obtenidos exitosamente",
+					}),
 					data: z.array(BinSchema),
-					statusCode: z.number(),
+					statusCode: z.number().openapi({ example: 200 }),
 				}),
 				description: "Contenedores cercanos obtenidos exitosamente",
 				statusCode: StatusCodes.OK,
 			},
 			{
 				schema: z.object({
-					data: z.array(z.any()),
-					statusCode: z.number(),
+					success: z.boolean().openapi({ example: true }),
+					message: z.string().openapi({ example: "No se encontraron contenedores cercanos" }),
+					data: z.array(z.any()).openapi({ example: [] }),
+					statusCode: z.number().openapi({ example: 200 }),
 				}),
 				description: "No se encontraron contenedores cercanos",
-				statusCode: StatusCodes.NO_CONTENT,
+				statusCode: StatusCodes.OK,
 			},
 			{
-				schema: z.object({}),
+				schema: z.object({
+					success: z.boolean().openapi({ example: false }),
+					message: z.string().openapi({
+						example: "Los parámetros 'lat' y 'lng' son requeridos",
+					}),
+					data: z.null().openapi({ example: null }),
+					statusCode: z.number().openapi({ example: 400 }),
+				}),
 				description: "Parámetros requeridos faltantes o inválidos",
 				statusCode: StatusCodes.BAD_REQUEST,
 			},
 			{
-				schema: z.object({}),
+				schema: z.object({
+					success: z.boolean().openapi({ example: false }),
+					message: z.string().openapi({
+						example: "Demasiadas solicitudes. Intenta de nuevo más tarde.",
+					}),
+					data: z.null().openapi({ example: null }),
+					statusCode: z.number().openapi({ example: 429 }),
+				}),
+				description: "Demasiadas solicitudes (rate limited)",
+				statusCode: StatusCodes.TOO_MANY_REQUESTS,
+			},
+			{
+				schema: z.object({
+					success: z.boolean().openapi({ example: false }),
+					message: z.string().openapi({ example: "Error interno del servidor" }),
+					data: z.null().openapi({ example: null }),
+					statusCode: z.number().openapi({ example: 500 }),
+				}),
 				description: "Error interno del servidor",
 				statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
 			},
@@ -342,64 +408,31 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 		responses: createApiResponses([
 			{
 				schema: z.object({
+					success: z.boolean().openapi({ example: true }),
+					message: z.string().openapi({ example: "Conteos jerárquicos obtenidos exitosamente" }),
 					data: z.array(HierarchyCountSchema),
-					statusCode: z.number(),
+					statusCode: z.number().openapi({ example: 200 }),
 				}),
 				description: "Conteos jerárquicos obtenidos exitosamente",
 				statusCode: StatusCodes.OK,
 			},
 			{
 				schema: z.object({
-					data: z.array(z.any()),
-					statusCode: z.number(),
-				}),
-				description: "No se encontraron datos para generar conteos jerárquicos",
-				statusCode: StatusCodes.NO_CONTENT,
-			},
-			{
-				schema: z.object({}),
-				description: "Tipo de contenedor inválido",
-				statusCode: StatusCodes.BAD_REQUEST,
-			},
-			{
-				schema: z.object({}),
-				description: "Error interno del servidor",
-				statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-			},
-		]),
-	});
-
-	// 6. DELETE /api/v1/bins/{binType} - Limpiar contenedores
-	registry.registerPath({
-		method: "delete",
-		path: "/api/v1/bins/{binType}",
-		summary: "Limpiar contenedores",
-		description: "Eliminar todos los contenedores de un tipo específico de la base de datos",
-		tags: ["Bins"],
-		request: {
-			params: z.object({
-				binType: z
-					.enum(["clothing_bins", "oil_bins", "glass_bins", "paper_bins", "plastic_bins", "organic_bins", "other_bins"])
-					.openapi({
-						example: "clothing_bins",
-						description: "Tipo de contenedor",
-					}),
-			}),
-		},
-		responses: createApiResponses([
-			{
-				schema: z.object({
 					success: z.boolean().openapi({ example: true }),
-					message: z.string().openapi({ example: "Contenedores eliminados exitosamente" }),
+					message: z.string().openapi({
+						example: "No se encontraron datos para generar conteos jerárquicos",
+					}),
+					data: z.array(z.any()).openapi({ example: [] }),
 					statusCode: z.number().openapi({ example: 200 }),
 				}),
-				description: "Contenedores eliminados exitosamente",
+				description: "No se encontraron datos para generar conteos jerárquicos",
 				statusCode: StatusCodes.OK,
 			},
 			{
 				schema: z.object({
 					success: z.boolean().openapi({ example: false }),
 					message: z.string().openapi({ example: "Tipo de contenedor inválido" }),
+					data: z.null().openapi({ example: null }),
 					statusCode: z.number().openapi({ example: 400 }),
 				}),
 				description: "Tipo de contenedor inválido",
@@ -408,7 +441,20 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 			{
 				schema: z.object({
 					success: z.boolean().openapi({ example: false }),
+					message: z.string().openapi({
+						example: "Demasiadas solicitudes. Intenta de nuevo más tarde.",
+					}),
+					data: z.null().openapi({ example: null }),
+					statusCode: z.number().openapi({ example: 429 }),
+				}),
+				description: "Demasiadas solicitudes (rate limited)",
+				statusCode: StatusCodes.TOO_MANY_REQUESTS,
+			},
+			{
+				schema: z.object({
+					success: z.boolean().openapi({ example: false }),
 					message: z.string().openapi({ example: "Error interno del servidor" }),
+					data: z.null().openapi({ example: null }),
 					statusCode: z.number().openapi({ example: 500 }),
 				}),
 				description: "Error interno del servidor",
@@ -417,7 +463,7 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 		]),
 	});
 
-	// 7. POST /api/v1/bins/{binType}/load-data - Cargar datos (temporal)
+	// 6. POST /api/v1/bins/{binType}/load-data - Cargar datos (temporal)
 	registry.registerPath({
 		method: "post",
 		path: "/api/v1/bins/{binType}/load-data",
@@ -450,11 +496,11 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 			{
 				schema: z.object({
 					success: z.boolean().openapi({ example: true }),
-					responseObject: z.object({
+					message: z.string().openapi({ example: "Datos cargados exitosamente" }),
+					data: z.object({
 						insertedCount: z.number().openapi({ example: 1254 }),
 						errors: z.array(z.any()).openapi({ example: [] }),
 					}),
-					message: z.string().openapi({ example: "Datos cargados exitosamente" }),
 					statusCode: z.number().openapi({ example: 200 }),
 				}),
 				description: "Datos cargados exitosamente",
@@ -464,6 +510,7 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 				schema: z.object({
 					success: z.boolean().openapi({ example: false }),
 					message: z.string().openapi({ example: "Datos CSV requeridos en el body" }),
+					data: z.null().openapi({ example: null }),
 					statusCode: z.number().openapi({ example: 400 }),
 				}),
 				description: "Error en la carga de datos",
@@ -472,7 +519,20 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 			{
 				schema: z.object({
 					success: z.boolean().openapi({ example: false }),
+					message: z.string().openapi({
+						example: "Demasiadas solicitudes. Intenta de nuevo más tarde.",
+					}),
+					data: z.null().openapi({ example: null }),
+					statusCode: z.number().openapi({ example: 429 }),
+				}),
+				description: "Demasiadas solicitudes (rate limited)",
+				statusCode: StatusCodes.TOO_MANY_REQUESTS,
+			},
+			{
+				schema: z.object({
+					success: z.boolean().openapi({ example: false }),
 					message: z.string().openapi({ example: "Error interno del servidor" }),
+					data: z.null().openapi({ example: null }),
 					statusCode: z.number().openapi({ example: 500 }),
 				}),
 				description: "Error interno del servidor",
@@ -481,7 +541,7 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 		]),
 	});
 
-	// 8. GET /api/v1/bins/{binType}/debug - Debug endpoint (temporal)
+	// 7. GET /api/v1/bins/{binType}/debug - Debug endpoint (temporal)
 	registry.registerPath({
 		method: "get",
 		path: "/api/v1/bins/{binType}/debug",
@@ -501,19 +561,31 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 		responses: createApiResponses([
 			{
 				schema: z.object({
-					debug: z.any(),
-					statusCode: z.number(),
+					success: z.boolean().openapi({ example: true }),
+					message: z.string().openapi({ example: "Debug exitoso" }),
+					data: z.any().openapi({ example: {} }),
+					statusCode: z.number().openapi({ example: 200 }),
 				}),
 				description: "Información de debug obtenida exitosamente",
 				statusCode: StatusCodes.OK,
 			},
 			{
-				schema: z.object({}),
+				schema: z.object({
+					success: z.boolean().openapi({ example: false }),
+					message: z.string().openapi({ example: "Error en el endpoint de debug" }),
+					data: z.null().openapi({ example: null }),
+					statusCode: z.number().openapi({ example: 400 }),
+				}),
 				description: "Error en el endpoint de debug",
 				statusCode: StatusCodes.BAD_REQUEST,
 			},
 			{
-				schema: z.object({}),
+				schema: z.object({
+					success: z.boolean().openapi({ example: false }),
+					message: z.string().openapi({ example: "Error interno del servidor" }),
+					data: z.null().openapi({ example: null }),
+					statusCode: z.number().openapi({ example: 500 }),
+				}),
 				description: "Error interno del servidor",
 				statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
 			},

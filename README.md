@@ -22,26 +22,34 @@ src/
 │   ├── apiRouter.ts                # Router principal de la API
 │   ├── v1/                         # Versión 1 de la API
 │   │   ├── v1Router.ts            # Router de la v1
-│   │   └── bins/                   # Módulo de contenedores
-│   │       ├── controllers/        # Controladores
-│   │       ├── middleware/         # Middleware específico
-│   │       ├── routes/             # Rutas
-│   │       ├── schemas/            # Esquemas Zod
-│   │       ├── services/           # Lógica de negocio
-│   │       ├── types/              # Tipos TypeScript
-│   │       └── scripts/            # Scripts de utilidad
+│   │   ├── bins/                   # Módulo de contenedores
+│   │   │   ├── controllers/        # Controladores HTTP
+│   │   │   ├── middleware/         # Middleware específico
+│   │   │   ├── routes/             # Rutas Express
+│   │   │   ├── schemas/            # Esquemas Zod
+│   │   │   ├── services/           # Lógica de negocio
+│   │   │   ├── repositories/       # Acceso a datos
+│   │   │   ├── types/              # Tipos TypeScript
+│   │   │   ├── constants/          # Constantes y mensajes
+│   │   │   ├── utils/              # Utilidades específicas
+│   │   │   └── scripts/            # Scripts de utilidad
+│   │   └── docs/                   # Documentación OpenAPI v1
 │   └── common/                     # Utilidades comunes de la API
 │       ├── lib/                    # Cliente Supabase
-│       └── utils/                  # Utilidades (geo, validación, etc.)
+│       ├── utils/                  # Utilidades (geo, validación, etc.)
+│       └── constants/              # Constantes globales
 ├── api-docs/                       # Documentación OpenAPI
 │   ├── openAPIDocumentGenerator.ts # Generador de documentación
 │   ├── openAPIRouter.ts            # Router de Swagger UI
 │   └── responseBuilders.ts         # Constructores de respuestas
-└── shared/                         # Utilidades compartidas
-    ├── lib/                        # Configuración OpenAPI
-    ├── middleware/                 # Middleware global
-    ├── models/                     # Modelos de respuesta
-    └── utils/                      # Utilidades generales
+├── shared/                         # Utilidades compartidas
+│   ├── lib/                        # Configuración OpenAPI
+│   ├── middleware/                 # Middleware global
+│   ├── models/                     # Modelos de respuesta
+│   └── utils/                      # Utilidades generales
+└── tests/                          # Tests y mocks
+    ├── mocks/                      # Mocks para testing
+    └── setup/                      # Configuración de tests
 ```
 
 ## 🛠️ Tecnologías
@@ -55,14 +63,23 @@ src/
 - **Helmet** - Seguridad HTTP
 - **CORS** - Cross-Origin Resource Sharing
 - **Rate Limiting** - Control de velocidad de requests
+- **Vitest** - Framework de testing
+- **Biome** - Linter y formateador
+- **Husky** - Git hooks
+- **tsup** - Bundler para TypeScript
 
 ## 📦 Instalación
 
 ### Prerrequisitos
 
 - Node.js 18+
-- npm o yarn
+- pnpm (gestor de paquetes recomendado)
 - Cuenta de Supabase
+
+> **Nota**: Este proyecto usa `pnpm` como gestor de paquetes. Si no lo tienes instalado:
+> ```bash
+> npm install -g pnpm
+> ```
 
 ### Configuración
 
@@ -76,7 +93,7 @@ src/
 2. **Instalar dependencias**
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 3. **Configurar variables de entorno**
@@ -105,26 +122,30 @@ src/
 ### Desarrollo
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 ### Producción
 
 ```bash
-npm run build
-npm start
+pnpm run build
+pnpm start
 ```
 
 ### Scripts disponibles
 
 ```bash
-npm run dev          # Desarrollo con hot reload
-npm run build        # Compilar TypeScript
-npm run start        # Ejecutar en producción
-npm run test         # Ejecutar tests
-npm run test:watch   # Tests en modo watch
-npm run lint         # Linter
-npm run lint:fix     # Linter con auto-fix
+pnpm run dev          # Desarrollo con hot reload
+pnpm run build        # Compilar TypeScript
+pnpm run start        # Ejecutar en producción
+pnpm run start:prod   # Ejecutar versión compilada
+pnpm run test         # Ejecutar tests
+pnpm run test:watch   # Tests en modo watch
+pnpm run test:cov     # Tests con coverage
+pnpm run lint         # Linter
+pnpm run lint:fix     # Linter con auto-fix
+pnpm run check:ci     # Verificación completa (lint + test + build)
+pnpm run prepare      # Configurar Husky (automático)
 ```
 
 ## 📚 API Endpoints
@@ -137,11 +158,11 @@ http://localhost:8080/api/v1
 
 ### Tipos de contenedores soportados
 
-- `clothing_bins` - Contenedores de ropa
-- `oil_bins` - Contenedores de aceite usado
+- `clothing_bins` - Contenedores de ropa y textil
+- `oil_bins` - Contenedores de aceite vegetal usado
 - `glass_bins` - Contenedores de vidrio
 - `paper_bins` - Contenedores de papel y cartón
-- `plastic_bins` - Contenedores de envases
+- `plastic_bins` - Contenedores de envases (plástico, metal, briks)
 - `organic_bins` - Contenedores de residuos orgánicos
 - `other_bins` - Contenedores de resto de residuos
 
@@ -236,7 +257,7 @@ CREATE TABLE clothing_bins (
 
 ```bash
 # Ejecutar script de actualización
-npm run update-data
+pnpm run update-data
 ```
 
 El script descarga automáticamente los datos más recientes desde el portal de datos abiertos de Madrid.
@@ -245,13 +266,38 @@ El script descarga automáticamente los datos más recientes desde el portal de 
 
 ```bash
 # Ejecutar todos los tests
-npm run test
+pnpm run test
 
 # Tests en modo watch
-npm run test:watch
+pnpm run test:watch
 
 # Tests con coverage
-npm run test:coverage
+pnpm run test:cov
+```
+
+### Cobertura de tests
+
+- **Repositories**: Acceso a datos y operaciones de base de datos
+- **Services**: Lógica de negocio y validaciones
+- **Controllers**: Manejo de HTTP requests/responses
+- **Middleware**: Validación de tipos y parámetros
+- **Utils**: Funciones de utilidad y helpers
+
+### Estructura de tests
+
+```
+src/
+├── tests/
+│   ├── mocks/           # Mocks reutilizables
+│   │   ├── supabaseMocks.ts
+│   │   └── binsDataMocks.ts
+│   └── setup/           # Configuración global
+│       └── supabase.mock.ts
+└── **/__tests__/        # Tests por módulo
+    ├── repositories/
+    ├── services/
+    ├── controllers/
+    └── middleware/
 ```
 
 ## 🔒 Seguridad
@@ -261,6 +307,9 @@ npm run test:coverage
 - **Helmet**: Headers de seguridad HTTP
 - **Validación**: Todos los inputs validados con Zod
 - **Sanitización**: Caracteres peligrosos filtrados en URLs
+- **Request Size Limits**: Límites en tamaño de requests
+- **Content-Type Validation**: Validación de tipos de contenido
+- **Graceful Shutdown**: Manejo seguro de cierre del servidor
 
 ## 🚀 Despliegue
 
@@ -273,12 +322,56 @@ HOST=0.0.0.0
 CORS_ORIGIN=https://your-frontend-domain.com
 ```
 
-### Docker
+### Render (Recomendado)
 
 ```bash
-docker build -t ecomad-backend .
-docker run -p 8080:8080 ecomad-backend
+# Configurar variables de entorno en Render Dashboard
+NODE_ENV=production
+PORT=8080
+HOST=0.0.0.0
+CORS_ORIGIN=https://your-frontend-domain.com
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
+
+### Build Commands para Render
+
+```bash
+Build Command: pnpm run build
+Start Command: pnpm run start:prod
+```
+
+## 🏗️ Arquitectura
+
+### Patrón de Diseño
+
+El proyecto implementa una **arquitectura en capas** con separación clara de responsabilidades:
+
+```
+┌─────────────────┐
+│   Controllers   │ ← Manejo de HTTP requests/responses
+├─────────────────┤
+│    Services     │ ← Lógica de negocio
+├─────────────────┤
+│  Repositories   │ ← Acceso a datos (Supabase)
+├─────────────────┤
+│    Database     │ ← Supabase PostgreSQL
+└─────────────────┘
+```
+
+### Principios de Calidad
+
+- **Separación de Responsabilidades**: Cada capa tiene una función específica
+- **Inmutabilidad**: Uso de métodos como `toSorted()` para evitar mutaciones
+- **Error Handling**: Manejo consistente de errores con códigos HTTP apropiados
+- **Type Safety**: TypeScript estricto con validación Zod
+- **Testing**: Cobertura completa de tests unitarios
+- **Documentación**: OpenAPI/Swagger automática y actualizada
+
+### Git Hooks (Husky)
+
+- **pre-commit**: Lint + format + tests rápidos
+- **pre-push**: Tests completos + build verification
 
 ## 🤝 Contribución
 
@@ -287,6 +380,15 @@ docker run -p 8080:8080 ecomad-backend
 3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
 4. Push a la rama (`git push origin feature/AmazingFeature`)
 5. Abre un Pull Request
+
+### Estándares de Código
+
+- **Usar `pnpm` como package manager** (no npm ni yarn)
+- Seguir las reglas de Biome para linting/formatting
+- Escribir tests para nuevas funcionalidades
+- Mantener la cobertura de tests > 80%
+- Actualizar documentación OpenAPI cuando sea necesario
+- Usar `pnpm run` para ejecutar scripts
 
 ## 📝 Licencia
 
@@ -300,4 +402,37 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 
 ---
 
-**Nota**: Este es un MVP (Minimum Viable Product) en desarrollo activo. La API puede cambiar en futuras versiones.
+## 📊 Estado del Proyecto
+
+### ✅ Completado
+
+- ✅ API REST completa con 7 endpoints
+- ✅ Documentación OpenAPI/Swagger actualizada
+- ✅ Arquitectura en capas (Controller-Service-Repository)
+- ✅ Testing completo con cobertura > 80%
+- ✅ Validación de datos con Zod
+- ✅ Manejo de errores consistente
+- ✅ Seguridad y rate limiting
+- ✅ Git hooks con Husky
+- ✅ Linting y formatting automático
+- ✅ Build optimizado con tsup
+
+### 🚀 Listo para Producción
+
+- ✅ Código estable y probado
+- ✅ Documentación completa
+- ✅ Configuración para Render
+- ✅ Variables de entorno configuradas
+- ✅ Scripts de deployment listos
+
+### 📋 Próximos Pasos
+
+- 🔄 Integración con frontend React Native
+- 📱 Optimizaciones para móvil
+- 🔍 Búsqueda avanzada por texto
+- 📊 Dashboard de administración
+- 🔐 Autenticación de usuarios
+
+---
+
+**Nota**: Este es un MVP (Minimum Viable Product) **completado y listo para producción**. La API es estable y está documentada.
