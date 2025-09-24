@@ -66,7 +66,7 @@ app.use((req, res, next) => {
 	// Validar que no haya caracteres peligrosos en la URL
 	// Solo aplicar en producción, no en tests
 	if (process.env.NODE_ENV !== "test") {
-		const dangerousChars = /[<>"'%;()&+]/;
+		const dangerousChars = /[<>"'%;()]/;
 		if (dangerousChars.test(req.url)) {
 			return res.status(400).json({
 				error: "Invalid characters in URL",
