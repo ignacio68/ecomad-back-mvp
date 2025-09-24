@@ -186,7 +186,7 @@ describe("BinsService", () => {
 		it("should return nearby bins from repository", async () => {
 			// Arrange
 			const binType = "clothing_bins";
-			const params = { lat: 40.4168, lng: -3.7038, radiusKm: 1, limit: 10 };
+			const params = { lat: 40.4168, lng: -3.7038, radius: 1, limit: 10 };
 			const mockBins: BinRecord[] = [];
 
 			vi.mocked(binsRepository.findNearby).mockResolvedValue(mockBins);
@@ -202,7 +202,7 @@ describe("BinsService", () => {
 		it("should throw error when repository fails", async () => {
 			// Arrange
 			const binType = "clothing_bins";
-			const params = { lat: 40.4168, lng: -3.7038, radiusKm: 1, limit: 10 };
+			const params = { lat: 40.4168, lng: -3.7038, radius: 1, limit: 10 };
 			const errorMessage = TEST_ERROR_MESSAGES.GEOSPATIAL_QUERY_FAILED;
 			vi.mocked(binsRepository.findNearby).mockRejectedValue(new Error(errorMessage));
 

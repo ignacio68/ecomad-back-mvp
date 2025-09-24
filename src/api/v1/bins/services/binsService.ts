@@ -110,7 +110,7 @@ export const getBinsNearby = async (binType: string, params: NearbyParams): Prom
 				binType: z.string().min(1),
 				lat: z.number().min(-90).max(90),
 				lng: z.number().min(-180).max(180),
-				radiusKm: z.number().positive().max(100),
+				radius: z.number().positive().max(100),
 				limit: z.number().int().positive().max(1000).optional(),
 			})
 			.parse({ binType, ...params });
