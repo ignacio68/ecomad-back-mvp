@@ -10,19 +10,36 @@ import type { CountsHierarchyResult, InsertManyResult } from "./types";
 export class BinsRepository {
 	/**
 	 * Obtiene todos los contenedores de un tipo específico
+	 * Usa paginación para obtener todos los registros (Supabase limita a 1000 por defecto)
 	 */
 	async findAll(binType: string): Promise<BinRecord[]> {
-		const { data, error } = await supabase
-			.from(binType)
-			.select("*")
-			.order("distrito", { ascending: true })
-			.order("barrio", { ascending: true });
+		const allData: BinRecord[] = [];
+		const pageSize = 1000;
+		let offset = 0;
+		let hasMore = true;
 
-		if (error) {
-			throw new Error(`${ERROR_MESSAGES.DATABASE_QUERY_FAILED}: ${error.message}`);
+		while (hasMore) {
+			const { data, error } = await supabase
+				.from(binType)
+				.select("*")
+				.order("distrito", { ascending: true })
+				.order("barrio", { ascending: true })
+				.range(offset, offset + pageSize - 1);
+
+			if (error) {
+				throw new Error(`${ERROR_MESSAGES.DATABASE_QUERY_FAILED}: ${error.message}`);
+			}
+
+			if (data && data.length > 0) {
+				allData.push(...data);
+				offset += pageSize;
+				hasMore = data.length === pageSize; // Si obtenemos menos de pageSize, no hay más datos
+			} else {
+				hasMore = false;
+			}
 		}
 
-		return data || [];
+		return allData;
 	}
 
 	/**
