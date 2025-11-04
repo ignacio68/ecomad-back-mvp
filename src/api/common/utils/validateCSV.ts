@@ -1,5 +1,5 @@
+import { Readable } from "node:stream";
 import { parse } from "csv-parse";
-import { Readable } from "stream";
 import type { ZodSchema } from "zod";
 
 type ValidationResult<T> = {
