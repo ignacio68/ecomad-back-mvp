@@ -99,33 +99,39 @@ src/
 
 3. **Configurar variables de entorno**
 
-   Crear archivos `.env.development`, `.env.production`, y `.env.test` según el entorno:
+   **⚠️ IMPORTANTE**: Los archivos `.env` NO están en el repositorio por seguridad.
 
-   **`.env.development`:**
+   Copia el archivo de ejemplo y configúralo:
+
+   ```bash
+   # Para desarrollo
+   cp env.example .env.development
+
+   # Para tests
+   cp env.example .env.test
+
+   # Para producción (Render usa variables de entorno directamente)
+   cp env.example .env.production
+   ```
+
+   Luego edita cada archivo con tus valores reales:
+
+   - `SUPABASE_URL`: https://supabase.com/dashboard/project/_/settings/api
+   - `SUPABASE_ANON_KEY`: Tu clave anon/public de Supabase
+   - `CORS_ORIGIN`: Orígenes permitidos (separados por comas)
+
+   **Valores recomendados por entorno:**
+
+   - **Development**: `COMMON_RATE_LIMIT_MAX_REQUESTS=1000`
+   - **Production**: `COMMON_RATE_LIMIT_MAX_REQUESTS=20`
+   - **Test**: `COMMON_RATE_LIMIT_MAX_REQUESTS=10000`
+
+   > 📝 Ver `env.example` para la lista completa de variables
+
+   **Ejemplo mínimo `.env.development`:**
 
    ```env
    NODE_ENV=development
-   PORT=8080
-   HOST=localhost
-   CORS_ORIGIN=http://localhost:3000
-
-   # Supabase
-   SUPABASE_URL=your_supabase_url
-   SUPABASE_ANON_KEY=your_supabase_anon_key
-
-   # Rate limiting (permisivo en desarrollo)
-   COMMON_RATE_LIMIT_MAX_REQUESTS=1000
-   COMMON_RATE_LIMIT_WINDOW_MS=900000
-
-   # Nearby defaults
-   MAX_RADIUS_KM=5
-   DEFAULT_LIMIT=1000
-   ```
-
-   **`.env.production`:**
-
-   ```env
-   NODE_ENV=production
    PORT=8080
    HOST=0.0.0.0
    CORS_ORIGIN=https://your-frontend-domain.com
