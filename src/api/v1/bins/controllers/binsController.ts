@@ -1,21 +1,17 @@
 import type { Request, RequestHandler, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import { validateCSV } from "@/api/common/utils/validateCSV";
 import { ERROR_MESSAGES } from "@/api/v1/bins/constants/errorMessages";
 import { SUCCESS_MESSAGES } from "@/api/v1/bins/constants/successMessages";
-import { csvBinSchema } from "@/api/v1/bins/schemas/binsSchema";
-import { ServiceResponse } from "@/shared/models/serviceResponse";
 import {
-	clearBins,
 	getAllBins,
 	getBinsByLocation,
 	getBinsCount,
 	getBinsCountsHierarchy,
 	getBinsNearby,
-	insertBins,
-} from "../services/binsService";
-import type { LocationParams, NearbyParams } from "../types/binTypes";
-import { mapErrorToStatusCode } from "../utils/errorMapper";
+} from "@/api/v1/bins/services/binsService";
+import type { LocationParams, NearbyParams } from "@/api/v1/bins/types/binTypes";
+import { mapErrorToStatusCode } from "@/api/v1/bins/utils/errorMapper";
+import { ServiceResponse } from "@/shared/models/serviceResponse";
 
 // Extender el tipo Request para incluir binType
 interface ExtendedRequest extends Request {
@@ -155,10 +151,10 @@ export const getBinsNearbyController: RequestHandler = async (req: ExtendedReque
 		}
 
 		// Validar que los parámetros sean números válidos
-		const latNum = parseFloat(lat as string);
-		const lngNum = parseFloat(lng as string);
-		const radiusNum = parseFloat(radius as string) || 5;
-		const limitNum = parseInt(limit as string) || 100;
+		const latNum = Number.parseFloat(lat as string);
+		const lngNum = Number.parseFloat(lng as string);
+		const radiusNum = Number.parseFloat(radius as string) || 5;
+		const limitNum = Number.parseInt(limit as string) || 100;
 
 		if (Number.isNaN(latNum) || Number.isNaN(lngNum) || Number.isNaN(radiusNum)) {
 			const response = ServiceResponse.failure(ERROR_MESSAGES.INVALID_COORDINATES_DETAIL, null);
@@ -211,70 +207,22 @@ export const getBinsCountsHierarchyController: RequestHandler = async (
 
 /**
  * POST /api/v1/:binType/load-data
- * Carga datos de contenedores desde CSV
+ * @deprecated Este endpoint está obsoleto. Usa el script `pnpm run import:bins` en su lugar.
+ * Carga datos de contenedores desde CSV (solo para desarrollo/testing)
  */
-export const loadBinsDataController: RequestHandler = async (req: ExtendedRequest, res: Response): Promise<void> => {
+export const loadBinsDataController: RequestHandler = async (_req: ExtendedRequest, res: Response): Promise<void> => {
 	try {
-		const binType = getBinTypeFromRequest(req);
-
-		// Validar que se proporcione csvData
-		if (!req.body?.csvData) {
-			const response = ServiceResponse.failure(ERROR_MESSAGES.MISSING_REQUIRED_FIELD, null);
-			res.status(StatusCodes.BAD_REQUEST).json(response);
-			return;
-		}
-
-		console.log("🔄 Usando CSV del body");
-		const csvText = req.body.csvData;
-		console.log("✅ CSV descargado, tamaño:", csvText.length, "caracteres");
-
-		console.log("🔄 Validando CSV...");
-		const { valid, invalid } = await validateCSV(csvText, csvBinSchema, {
-			delimiter: ";",
-			skipEmptyLines: true,
-		});
-
-		console.log("✅ Valid records:", valid.length);
-		console.log("❌ Invalid records:", invalid.length);
-
-		if (valid.length === 0) {
-			const response = ServiceResponse.failure(ERROR_MESSAGES.INVALID_CSV_DATA, null);
-			res.status(StatusCodes.BAD_REQUEST).json(response);
-			return;
-		}
-
-		// Transformar datos CSV a formato de base de datos
-		const bins = valid.map((bin) => ({
-			tipo_dato: bin.TIPO_DATO,
-			lote: String(bin.LOTE),
-			cod_dist: String(bin.COD_DIST),
-			distrito: bin.DISTRITO,
-			cod_barrio: String(bin.COD_BARRIO),
-			barrio: bin.BARRIO,
-			direccion_completa: bin.DIRECCION_COMPLETA,
-			via_clase: bin.VIA_CLASE,
-			via_par: bin.VIA_PAR,
-			via_nombre: bin.VIA_NOMBRE,
-			tipo_numero: bin.TIPO_NUMERO,
-			numero: bin.NUMERO,
-			latitud: typeof bin.LATITUD === "string" ? parseFloat(bin.LATITUD) : bin.LATITUD,
-			longitud: typeof bin.LONGITUD === "string" ? parseFloat(bin.LONGITUD) : bin.LONGITUD,
-			direccion_completa_ampliada: bin["DIRECCIÓN COMPLETA AMPLIADA"],
-			mas_informacion: bin["MÁS INFORMACIÓN"],
-			created_at: new Date().toISOString(),
-		}));
-
-		console.log("🔄 Limpiando datos existentes...");
-		await clearBins(binType);
-
-		console.log("🔄 Insertando nuevos datos...");
-		const result = await insertBins(binType, bins);
-
-		const response = ServiceResponse.success(SUCCESS_MESSAGES.DATA_LOADED, {
-			insertedCount: result.inserted,
-			errors: result.errors,
-		});
-		res.status(StatusCodes.OK).json(response);
+		// Este endpoint está obsoleto - devolver mensaje informativo
+		const response = ServiceResponse.failure(
+			"Este endpoint está obsoleto. Usa el script 'pnpm run import:bins' para importar datos.",
+			{
+				deprecated: true,
+				alternative: "Use el script de importación: pnpm run import:bins",
+				documentation: "Ver README.md sección 'Scripts de Utilidad'",
+			},
+			StatusCodes.GONE,
+		);
+		res.status(StatusCodes.GONE).json(response);
 	} catch (error) {
 		handleError(error, res, ERROR_MESSAGES.DATA_INSERTION_FAILED);
 	}

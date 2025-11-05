@@ -3,9 +3,9 @@ import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Importar la app de Express
-import { app } from "@/app";
+import { app } from "../../../../../app";
 // Importar mocks compartidos
-import { mockBins, mockCsvBins, mockHierarchy } from "@/tests/mocks/binsDataMocks";
+import { mockBins, mockHierarchy } from "../../../../../tests/mocks/binsDataMocks";
 // Importar constantes de mensajes
 import { ERROR_MESSAGES } from "../../constants/errorMessages";
 import { SUCCESS_MESSAGES } from "../../constants/successMessages";
@@ -22,7 +22,7 @@ vi.mock("../../services/binsService", () => ({
 }));
 
 // Importar mocks de utilidades
-import { mockValidateCSV } from "@/tests/mocks/utilsMocks";
+import { mockValidateCSV } from "../../../../../tests/mocks/utilsMocks";
 // Importar después de los mocks
 import {
 	clearBins,
@@ -277,96 +277,35 @@ describe("binsController", () => {
 		});
 	});
 
-	describe("POST /api/v1/:binType/load", () => {
-		it("should load data successfully", async () => {
+	describe("POST /api/v1/:binType/load (DEPRECATED)", () => {
+		it("should return 410 GONE - endpoint is deprecated", async () => {
 			const mockCsvData = "TIPO_DATO;LOTE;COD_DIST;...";
-
-			mockValidateCSV.mockResolvedValue({
-				valid: mockCsvBins,
-				invalid: [],
-			});
-
-			vi.mocked(clearBins).mockResolvedValue(undefined);
-
-			vi.mocked(insertBins).mockResolvedValue({
-				inserted: mockCsvBins.length,
-				errors: [],
-			});
 
 			const response = await request(app)
 				.post("/api/v1/bins/clothing_bins/load-data")
 				.send({ csvData: mockCsvData })
-				.expect(StatusCodes.OK);
+				.expect(StatusCodes.GONE);
 
-			expect(mockValidateCSV).toHaveBeenCalledWith(mockCsvData, expect.any(Object), expect.any(Object));
-			expect(clearBins).toHaveBeenCalledWith("clothing_bins");
-			// El controlador transforma los datos CSV a formato de base de datos
-			expect(insertBins).toHaveBeenCalledWith("clothing_bins", expect.any(Array));
 			expect(response.body).toEqual({
-				success: true,
+				success: false,
 				responseObject: {
-					insertedCount: mockCsvBins.length,
-					errors: [],
+					deprecated: true,
+					alternative: "Use el script de importación: pnpm run import:bins",
+					documentation: "Ver README.md sección 'Scripts de Utilidad'",
 				},
-				message: SUCCESS_MESSAGES.DATA_LOADED,
-				statusCode: StatusCodes.OK,
+				message: "Este endpoint está obsoleto. Usa el script 'pnpm run import:bins' para importar datos.",
+				statusCode: StatusCodes.GONE,
 			});
 		});
 
-		it("should handle missing CSV data", async () => {
+		it("should return 410 GONE even with no data", async () => {
 			const response = await request(app)
 				.post("/api/v1/bins/clothing_bins/load-data")
 				.send({})
-				.expect(StatusCodes.BAD_REQUEST);
+				.expect(StatusCodes.GONE);
 
-			expect(response.body).toEqual({
-				success: false,
-				responseObject: null,
-				message: ERROR_MESSAGES.MISSING_REQUIRED_FIELD,
-				statusCode: StatusCodes.BAD_REQUEST,
-			});
-		});
-
-		it("should handle CSV validation errors", async () => {
-			mockValidateCSV.mockResolvedValue({
-				valid: [],
-				invalid: [{ row: 1, error: "Invalid data" }],
-			});
-
-			const response = await request(app)
-				.post("/api/v1/bins/clothing_bins/load-data")
-				.send({ csvData: "invalid,csv,data" })
-				.expect(StatusCodes.BAD_REQUEST);
-
-			expect(response.body).toEqual({
-				success: false,
-				responseObject: null,
-				message: ERROR_MESSAGES.INVALID_CSV_DATA,
-				statusCode: StatusCodes.BAD_REQUEST,
-			});
-		});
-
-		it("should handle service errors during clear", async () => {
-			const mockCsvData = "TIPO_DATO;LOTE;COD_DIST;...";
-
-			mockValidateCSV.mockResolvedValue({
-				valid: mockCsvBins,
-				invalid: [],
-			});
-
-			vi.mocked(clearBins).mockRejectedValue(new Error(ERROR_MESSAGES.DATA_DELETION_FAILED));
-
-			const response = await request(app)
-				.post("/api/v1/bins/clothing_bins/load-data")
-				.send({ csvData: mockCsvData })
-				.expect(StatusCodes.INTERNAL_SERVER_ERROR);
-
-			expect(response.body).toEqual({
-				success: false,
-				responseObject: null,
-				message: ERROR_MESSAGES.DATA_DELETION_FAILED,
-				statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-			});
+			expect(response.body.success).toBe(false);
+			expect(response.body.statusCode).toBe(StatusCodes.GONE);
 		});
 	});
 

@@ -100,7 +100,7 @@ export class BinsRepository {
 
 		// La función ya devuelve los bins ordenados por distancia
 		// Remover el campo distance_km antes de devolver (es solo para ordenar)
-		return (data || []).map(({ distance_km, ...bin }) => bin) as BinRecord[];
+		return (data || []).map(({ distance_km: _distance, ...bin }: any) => bin) as BinRecord[];
 	}
 
 	/**
