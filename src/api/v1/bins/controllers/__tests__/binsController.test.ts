@@ -2,15 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-// Importar la app de Express
-import { app } from "../../../../../app";
-// Importar mocks compartidos
-import { mockBins, mockHierarchy } from "../../../../../tests/mocks/binsDataMocks";
-// Importar constantes de mensajes
-import { ERROR_MESSAGES } from "../../constants/errorMessages";
-import { SUCCESS_MESSAGES } from "../../constants/successMessages";
-
-// Mock de los servicios
+// Mock de los servicios - DEBE estar antes de importar la app
 vi.mock("../../services/binsService", () => ({
 	getAllBins: vi.fn(),
 	getBinsCount: vi.fn(),
@@ -21,8 +13,15 @@ vi.mock("../../services/binsService", () => ({
 	insertBins: vi.fn(),
 }));
 
+// Importar la app de Express DESPUÉS de los mocks
+import { app } from "../../../../../app";
+// Importar mocks compartidos
+import { mockBins, mockHierarchy } from "../../../../../tests/mocks/binsDataMocks";
 // Importar mocks de utilidades
 import { mockValidateCSV } from "../../../../../tests/mocks/utilsMocks";
+// Importar constantes de mensajes
+import { ERROR_MESSAGES } from "../../constants/errorMessages";
+import { SUCCESS_MESSAGES } from "../../constants/successMessages";
 // Importar después de los mocks
 import {
 	clearBins,
