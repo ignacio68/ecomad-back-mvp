@@ -1,7 +1,7 @@
 import type { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import { StatusCodes } from "http-status-codes";
-import { createApiResponses } from "../../../api-docs/responseBuilders";
-import { z } from "../../../api-docs/zod-extensions";
+import { createApiResponses } from "@/api-docs/responseBuilders";
+import { z } from "@/api-docs/zod-extensions";
 
 /**
  * Documentación OpenAPI para el módulo de bins (contenedores)
@@ -12,27 +12,53 @@ import { z } from "../../../api-docs/zod-extensions";
  * - Respuestas consistentes con códigos HTTP estándar
  */
 
-// Schema para Bin
+// Schema para Bin (estructura real de la base de datos)
 export const BinSchema = z
 	.object({
-		tipo_dato: z.string().openapi({ example: "PUNTO LIMPIO" }),
-		lote: z.string().openapi({ example: "1" }),
-		cod_dist: z.string().openapi({ example: "1" }),
-		distrito: z.string().openapi({ example: "CENTRO" }),
-		cod_barrio: z.string().openapi({ example: "1" }),
-		barrio: z.string().openapi({ example: "PALACIO" }),
-		direccion_completa: z.string().openapi({ example: "CALLE MAYOR 1" }),
-		via_clase: z.string().openapi({ example: "CALLE" }),
-		via_par: z.string().openapi({ example: "IMPAR" }),
-		via_nombre: z.string().openapi({ example: "MAYOR" }),
-		tipo_numero: z.string().openapi({ example: "NÚMERO" }),
-		numero: z.string().openapi({ example: "1" }),
-		latitud: z.number().openapi({ example: 40.4168 }),
-		longitud: z.number().openapi({ example: -3.7038 }),
-		direccion_completa_ampliada: z.string().openapi({ example: "CALLE MAYOR 1, 28013 MADRID" }),
-		mas_informacion: z.string().openapi({ example: "Contenedor textil" }),
-		created_at: z.string().optional(),
-		updated_at: z.string().optional(),
+		id: z.number().openapi({ example: 12947, description: "ID único del contenedor" }),
+		category_group_id: z.number().openapi({ example: 1, description: "ID del grupo de categoría" }),
+		category_id: z.number().openapi({ example: 14, description: "ID de la categoría específica" }),
+		district_id: z.number().openapi({ example: 1, description: "ID del distrito (1-35)" }),
+		neighborhood_id: z.number().nullable().openapi({ example: 5, description: "ID del barrio (1-218) - opcional" }),
+		address: z.string().openapi({
+			example: "CALLE DEL DESENGAÑO, 16",
+			description: "Dirección completa",
+		}),
+		lat: z.number().openapi({ example: 40.42091, description: "Latitud (WGS84)" }),
+		lng: z.number().openapi({ example: -3.70348, description: "Longitud (WGS84)" }),
+		load_type: z.string().nullable().openapi({ example: null, description: "Tipo de carga - opcional" }),
+		direction: z.string().nullable().openapi({
+			example: null,
+			description: "Dirección adicional - opcional",
+		}),
+		subtype: z.string().nullable().openapi({
+			example: "Contenedor superficie",
+			description: "Subtipo de contenedor - opcional",
+		}),
+		placement_type: z.string().nullable().openapi({
+			example: null,
+			description: "Tipo de emplazamiento - opcional",
+		}),
+		notes: z.string().nullable().openapi({
+			example: "Además se puede depositar ropa usada en los puntos limpios fijos y móviles",
+			description: "Notas adicionales - opcional",
+		}),
+		bus_stop: z.string().nullable().openapi({
+			example: null,
+			description: "Parada de bus (solo battery_bins)",
+		}),
+		interurban_node: z.string().nullable().openapi({
+			example: null,
+			description: "Nodo interurbano (solo battery_bins)",
+		}),
+		created_at: z.string().openapi({
+			example: "2025-11-05T14:10:46.524733+00:00",
+			description: "Fecha de creación (ISO 8601)",
+		}),
+		updated_at: z.string().openapi({
+			example: "2025-11-05T14:12:16.932091+00:00",
+			description: "Fecha de actualización (ISO 8601)",
+		}),
 	})
 	.openapi("Bin");
 
@@ -84,9 +110,12 @@ export const PaginationQuerySchema = z
 // Schema para conteos jerárquicos (estructura plana)
 export const HierarchyCountSchema = z
 	.object({
-		distrito: z.string().openapi({ example: "CENTRO", description: "Nombre del distrito" }),
-		barrio: z.string().openapi({ example: "PALACIO", description: "Nombre del barrio" }),
-		count: z.number().openapi({ example: 25, description: "Contenedores en el barrio" }),
+		distrito: z.string().openapi({ example: "1", description: "ID del distrito (1-35)" }),
+		barrio: z.string().openapi({ example: "5", description: "ID del barrio (1-218)" }),
+		count: z.number().openapi({
+			example: 17,
+			description: "Número de contenedores en el barrio",
+		}),
 	})
 	.openapi("HierarchyCount");
 
@@ -101,7 +130,16 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 		request: {
 			params: z.object({
 				binType: z
-					.enum(["clothing_bins", "oil_bins", "glass_bins", "paper_bins", "plastic_bins", "organic_bins", "other_bins"])
+					.enum([
+						"clothing_bins",
+						"oil_bins",
+						"glass_bins",
+						"paper_bins",
+						"plastic_bins",
+						"organic_bins",
+						"battery_bins",
+						"other_bins",
+					])
 					.openapi({
 						example: "clothing_bins",
 						description: "Tipo de contenedor",
@@ -175,7 +213,16 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 		request: {
 			params: z.object({
 				binType: z
-					.enum(["clothing_bins", "oil_bins", "glass_bins", "paper_bins", "plastic_bins", "organic_bins", "other_bins"])
+					.enum([
+						"clothing_bins",
+						"oil_bins",
+						"glass_bins",
+						"paper_bins",
+						"plastic_bins",
+						"organic_bins",
+						"battery_bins",
+						"other_bins",
+					])
 					.openapi({
 						example: "clothing_bins",
 						description: "Tipo de contenedor",
@@ -233,7 +280,16 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 		request: {
 			params: z.object({
 				binType: z
-					.enum(["clothing_bins", "oil_bins", "glass_bins", "paper_bins", "plastic_bins", "organic_bins", "other_bins"])
+					.enum([
+						"clothing_bins",
+						"oil_bins",
+						"glass_bins",
+						"paper_bins",
+						"plastic_bins",
+						"organic_bins",
+						"battery_bins",
+						"other_bins",
+					])
 					.openapi({
 						example: "clothing_bins",
 						description: "Tipo de contenedor",
@@ -243,8 +299,8 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 					description: "Tipo de ubicación: 'district' para distrito o 'neighborhood' para barrio",
 				}),
 				locationValue: z.string().openapi({
-					example: "CENTRO",
-					description: "Nombre del distrito (ej: ARGANZUELA, CENTRO) o barrio (ej: PALACIO, CHUECA)",
+					example: "1",
+					description: "ID del distrito (1-35) o barrio (1-218). Ejemplo: '1' para Centro, '5' para barrio Universidad",
 				}),
 			}),
 			query: PaginationQuerySchema,
@@ -320,7 +376,16 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 		request: {
 			params: z.object({
 				binType: z
-					.enum(["clothing_bins", "oil_bins", "glass_bins", "paper_bins", "plastic_bins", "organic_bins", "other_bins"])
+					.enum([
+						"clothing_bins",
+						"oil_bins",
+						"glass_bins",
+						"paper_bins",
+						"plastic_bins",
+						"organic_bins",
+						"battery_bins",
+						"other_bins",
+					])
 					.openapi({
 						example: "clothing_bins",
 						description: "Tipo de contenedor",
@@ -398,7 +463,16 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 		request: {
 			params: z.object({
 				binType: z
-					.enum(["clothing_bins", "oil_bins", "glass_bins", "paper_bins", "plastic_bins", "organic_bins", "other_bins"])
+					.enum([
+						"clothing_bins",
+						"oil_bins",
+						"glass_bins",
+						"paper_bins",
+						"plastic_bins",
+						"organic_bins",
+						"battery_bins",
+						"other_bins",
+					])
 					.openapi({
 						example: "clothing_bins",
 						description: "Tipo de contenedor",
@@ -473,7 +547,16 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 		request: {
 			params: z.object({
 				binType: z
-					.enum(["clothing_bins", "oil_bins", "glass_bins", "paper_bins", "plastic_bins", "organic_bins", "other_bins"])
+					.enum([
+						"clothing_bins",
+						"oil_bins",
+						"glass_bins",
+						"paper_bins",
+						"plastic_bins",
+						"organic_bins",
+						"battery_bins",
+						"other_bins",
+					])
 					.openapi({
 						example: "clothing_bins",
 						description: "Tipo de contenedor",
@@ -551,7 +634,16 @@ export const binOpenAPI = (registry: OpenAPIRegistry) => {
 		request: {
 			params: z.object({
 				binType: z
-					.enum(["clothing_bins", "oil_bins", "glass_bins", "paper_bins", "plastic_bins", "organic_bins", "other_bins"])
+					.enum([
+						"clothing_bins",
+						"oil_bins",
+						"glass_bins",
+						"paper_bins",
+						"plastic_bins",
+						"organic_bins",
+						"battery_bins",
+						"other_bins",
+					])
 					.openapi({
 						example: "clothing_bins",
 						description: "Tipo de contenedor",

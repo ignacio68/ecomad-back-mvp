@@ -1,23 +1,13 @@
 import { z } from "zod";
-import { ERROR_MESSAGES } from "../constants/errorMessages";
-import { binsRepository } from "../repositories";
-import type { BinRecord, BinType, LocationParams, NearbyParams } from "../types/binTypes";
+import { BIN_TYPES } from "@/api/v1/bins/constants/binTypes";
+import { ERROR_MESSAGES } from "@/api/v1/bins/constants/errorMessages";
+import { binsRepository } from "@/api/v1/bins/repositories";
+import type { BinRecord, BinType, LocationParams, NearbyParams } from "@/api/v1/bins/types/binTypes";
 
 /**
  * Servicio de lógica de negocio para contenedores
  * Solo contiene lógica de negocio, sin códigos HTTP ni acceso directo a datos
  */
-
-// Constante con los tipos válidos de contenedores
-const BIN_TYPES: BinType[] = [
-	"clothing_bins",
-	"oil_bins",
-	"glass_bins",
-	"paper_bins",
-	"plastic_bins",
-	"organic_bins",
-	"other_bins",
-];
 
 // Validación de binType usando type guard
 const validateBinType = (value: string): value is BinType => {

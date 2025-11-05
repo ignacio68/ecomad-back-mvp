@@ -1,7 +1,7 @@
-import { supabase } from "../../../common/lib/supabase";
-import { ERROR_MESSAGES } from "../constants/errorMessages";
-import type { BinRecord, LocationParams, NearbyParams } from "../types/binTypes";
-import type { CountsHierarchyResult, InsertManyResult } from "./types";
+import { supabase } from "@/api/common/lib/supabase";
+import { ERROR_MESSAGES } from "@/api/v1/bins/constants/errorMessages";
+import type { CountsHierarchyResult, InsertManyResult } from "@/api/v1/bins/repositories/types";
+import type { BinRecord, LocationParams, NearbyParams } from "@/api/v1/bins/types/binTypes";
 
 /**
  * Repository para operaciones de datos con Supabase
@@ -22,8 +22,8 @@ export class BinsRepository {
 			const { data, error } = await supabase
 				.from(binType)
 				.select("*")
-				.order("distrito", { ascending: true })
-				.order("barrio", { ascending: true })
+				.order("district_id", { ascending: true })
+				.order("neighborhood_id", { ascending: true })
 				.range(offset, offset + pageSize - 1);
 
 			if (error) {
@@ -61,14 +61,14 @@ export class BinsRepository {
 	async findByLocation(binType: string, params: LocationParams): Promise<BinRecord[]> {
 		const { locationType, locationValue, page = 1, limit = 100 } = params;
 		const offset = (page - 1) * limit;
-		const columnName = locationType === "district" ? "distrito" : "barrio";
+		const columnName = locationType === "district" ? "district_id" : "neighborhood_id";
 
 		const { data, error } = await supabase
 			.from(binType)
 			.select("*")
 			.eq(columnName, locationValue)
-			.order("distrito", { ascending: true })
-			.order("barrio", { ascending: true })
+			.order("district_id", { ascending: true })
+			.order("neighborhood_id", { ascending: true })
 			.range(offset, offset + limit - 1);
 
 		if (error) {
@@ -80,48 +80,34 @@ export class BinsRepository {
 
 	/**
 	 * Obtiene contenedores cercanos a una coordenada
+	 * Usa la función PostgreSQL find_nearby_bins con earthdistance extension
 	 */
 	async findNearby(binType: string, params: NearbyParams): Promise<BinRecord[]> {
 		const { lat, lng, radius, limit = 100 } = params;
-		// Supabase no tiene soporte nativo para consultas geoespaciales complejas
-		// Obtenemos todos los datos y los filtramos en memoria (no ideal para grandes datasets)
-		const { data, error } = await supabase
-			.from(binType)
-			.select("*")
-			.not("latitud", "is", null)
-			.not("longitud", "is", null)
-			.limit(limit * 2); // Obtenemos más datos para compensar el filtrado en memoria
+
+		// Llamar a la función PostgreSQL optimizada
+		const { data, error } = await supabase.rpc("find_nearby_bins", {
+			p_table_name: binType,
+			p_lat: lat,
+			p_lng: lng,
+			p_radius_km: radius,
+			p_limit: limit,
+		});
 
 		if (error) {
 			throw new Error(`${ERROR_MESSAGES.DATABASE_QUERY_FAILED}: ${error.message}`);
 		}
 
-		if (!data) return [];
-
-		// Filtrar por distancia (esto debería moverse a una función de utilidad)
-		const nearbyBins = data.filter((bin) => {
-			if (!bin.latitud || !bin.longitud) return false;
-
-			const distance = this.calculateDistance(lat, lng, parseFloat(bin.latitud), parseFloat(bin.longitud));
-
-			return distance <= radius;
-		});
-
-		// Ordenar por distancia y limitar (usando sort con copia para inmutabilidad)
-		return [...nearbyBins]
-			.sort((a, b) => {
-				const distanceA = this.calculateDistance(lat, lng, parseFloat(a.latitud), parseFloat(a.longitud));
-				const distanceB = this.calculateDistance(lat, lng, parseFloat(b.latitud), parseFloat(b.longitud));
-				return distanceA - distanceB;
-			})
-			.slice(0, limit);
+		// La función ya devuelve los bins ordenados por distancia
+		// Remover el campo distance_km antes de devolver (es solo para ordenar)
+		return (data || []).map(({ distance_km, ...bin }) => bin) as BinRecord[];
 	}
 
 	/**
 	 * Obtiene conteos jerárquicos por distrito y barrio
 	 */
 	async getCountsHierarchy(binType: string): Promise<CountsHierarchyResult[]> {
-		const { data, error } = await supabase.from(binType).select("distrito, barrio");
+		const { data, error } = await supabase.from(binType).select("district_id, neighborhood_id");
 
 		if (error) {
 			throw new Error(`${ERROR_MESSAGES.DATABASE_QUERY_FAILED}: ${error.message}`);
@@ -132,14 +118,18 @@ export class BinsRepository {
 		// Agrupar y contar
 		const counts = new Map<string, number>();
 		data.forEach((bin) => {
-			const key = `${bin.distrito}-${bin.barrio}`;
+			const key = `${bin.district_id}-${bin.neighborhood_id || "null"}`;
 			counts.set(key, (counts.get(key) || 0) + 1);
 		});
 
-		// Convertir a array
+		// Convertir a array con nombres de distrito y barrio (IDs por ahora)
 		return Array.from(counts.entries()).map(([key, count]) => {
-			const [distrito, barrio] = key.split("-");
-			return { distrito, barrio, count };
+			const [districtId, neighborhoodId] = key.split("-");
+			return {
+				distrito: districtId,
+				barrio: neighborhoodId === "null" ? "" : neighborhoodId,
+				count,
+			};
 		});
 	}
 
@@ -180,21 +170,6 @@ export class BinsRepository {
 		if (error) {
 			throw new Error(`${ERROR_MESSAGES.DATA_DELETION_FAILED}: ${error.message}`);
 		}
-	}
-
-	/**
-	 * Calcula la distancia entre dos puntos usando la fórmula de Haversine
-	 * @private
-	 */
-	private calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
-		const R = 6371; // Radio de la Tierra en km
-		const dLat = ((lat2 - lat1) * Math.PI) / 180;
-		const dLng = ((lng2 - lng1) * Math.PI) / 180;
-		const a =
-			Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-			Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
-		const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-		return R * c;
 	}
 }
 

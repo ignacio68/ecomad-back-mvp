@@ -1,6 +1,6 @@
 import { validateCSV } from "@/api/common/utils/validateCSV";
-import { csvBinSchema } from "../schemas/binsSchema";
-import { clearBins, getBinsCount, insertBins } from "../services/binsService";
+import { csvBinSchema } from "@/api/v1/bins/schemas/binsSchema";
+import { clearBins, getBinsCount, insertBins } from "@/api/v1/bins/services/binsService";
 
 const CSV_URL = "https://datos.madrid.es/egob/catalogo/204410-1-contenedores-ropa.csv";
 

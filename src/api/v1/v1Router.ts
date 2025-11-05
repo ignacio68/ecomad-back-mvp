@@ -1,5 +1,5 @@
 import express, { type Router } from "express";
-import binsRouter from "./bins/routes/binsRouter";
+import binsRouter from "@/api/v1/bins/routes/binsRouter";
 
 /**
  * Router de la versión v1 de la API

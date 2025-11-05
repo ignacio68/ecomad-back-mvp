@@ -1,0 +1,113 @@
+
+> ecomad-back-mvp@1.0.1 import:bins /Users/ignaciolopez-amorpinillos/proyectos/EcoMAD/ecomad-back-mvp
+> tsx src/scripts/importAllBins.ts
+
+[dotenv@17.2.1] injecting env (8) from config.env -- tip: ⚙️  enable debug logging with { debug: true }
+🌱 EcoMAD - Importación de Contenedores
+==========================================
+
+
+📄 Procesando: ContenedoresRopa.csv
+   Tabla: clothing_bins
+   Categoría: 14
+   📖 Leyendo CSV...
+   📊 Filas encontradas: 1175
+   🔄 Procesando en 2 lote(s) de 1000 filas máx...
+   📦 Lote 1/2 (1000 filas)...
+(node:71440) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+      ✓ Insertados: 0, Actualizados: 0, Errores: 1000
+   📦 Lote 2/2 (175 filas)...
+      ✓ Insertados: 0, Actualizados: 0, Errores: 175
+   ✅ Importación completada:
+      • Total insertados: 0
+      • Total actualizados: 0
+      • Total errores: 1175
+      • Total procesado: 1175
+
+📄 Procesando: contenedores_vidrio_con_publicidad.csv
+   Tabla: glass_bins
+   Categoría: 11 (advertising)
+   📖 Leyendo CSV...
+   📊 Filas encontradas: 190
+   🔄 Procesando en 1 lote(s) de 1000 filas máx...
+   📦 Lote 1/1 (190 filas)...
+      ✓ Insertados: 0, Actualizados: 0, Errores: 190
+   ✅ Importación completada:
+      • Total insertados: 0
+      • Total actualizados: 0
+      • Total errores: 190
+      • Total procesado: 190
+
+📄 Procesando: RecogidaContenedoresAceiteUsado.csv
+   Tabla: oil_bins
+   Categoría: 15
+   📖 Leyendo CSV...
+   📊 Filas encontradas: 124
+   🔄 Procesando en 1 lote(s) de 1000 filas máx...
+   📦 Lote 1/1 (124 filas)...
+      ✓ Insertados: 0, Actualizados: 0, Errores: 124
+   ✅ Importación completada:
+      • Total insertados: 0
+      • Total actualizados: 0
+      • Total errores: 124
+      • Total procesado: 124
+
+📄 Procesando: mupis_pilas.csv
+   Tabla: battery_bins
+   Categoría: 17 (mupi)
+   📖 Leyendo CSV...
+   📊 Filas encontradas: 401
+   🔄 Procesando en 1 lote(s) de 1000 filas máx...
+   📦 Lote 1/1 (401 filas)...
+      ✓ Insertados: 0, Actualizados: 0, Errores: 401
+   ✅ Importación completada:
+      • Total insertados: 0
+      • Total actualizados: 0
+      • Total errores: 401
+      • Total procesado: 401
+
+📄 Procesando: Marquesinas_contenedores_pilas_2024_10_29.csv
+   Tabla: battery_bins
+   Categoría: 17 (marquesina)
+   📖 Leyendo CSV...
+   📊 Filas encontradas: 1492
+   🔄 Procesando en 2 lote(s) de 1000 filas máx...
+   📦 Lote 1/2 (1000 filas)...
+      ✓ Insertados: 0, Actualizados: 0, Errores: 1000
+   📦 Lote 2/2 (492 filas)...
+      ✓ Insertados: 0, Actualizados: 0, Errores: 492
+   ✅ Importación completada:
+      • Total insertados: 0
+      • Total actualizados: 0
+      • Total errores: 1492
+      • Total procesado: 1492
+
+📄 Procesando: Contenedores_varios.csv
+   Tabla: varios
+   Categoría: 0
+   📖 Leyendo CSV...
+   📊 Filas encontradas: 43889
+   🔄 Procesando en 44 lote(s) de 1000 filas máx...
+   📦 Lote 1/44 (1000 filas)...
+   ❌ Error en lote 1: {
+  code: '42883',
+  details: null,
+  hint: 'No function matches the given name and argument types. You might need to add explicit type casts.',
+  message: 'function public.import_bins(text, jsonb, integer, smallint, text, unknown) does not exist'
+}
+❌ Error en Contenedores_varios.csv: {
+  code: '42883',
+  details: null,
+  hint: 'No function matches the given name and argument types. You might need to add explicit type casts.',
+  message: 'function public.import_bins(text, jsonb, integer, smallint, text, unknown) does not exist'
+}
+
+==========================================
+📊 Resumen de importación:
+   ✅ Exitosas: 5/6
+   ❌ Fallidas: 1/6
+   ⏱️  Tiempo total: 2.51s
+==========================================
+
+ ELIFECYCLE  Command failed with exit code 1.

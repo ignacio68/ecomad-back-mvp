@@ -1,6 +1,6 @@
 import { vi } from "vitest";
 
-type Op = "select" | "insert" | "update" | "delete";
+type Op = "select" | "insert" | "update" | "delete" | "rpc";
 type Result = { data: any; error: any; status?: number; count?: number };
 
 export function createSupabaseMock() {
@@ -9,6 +9,7 @@ export function createSupabaseMock() {
 	const calls: Array<{
 		table: string;
 		op: Op | null;
+		method?: string;
 		args: Record<string, any>;
 		filters: Array<[string, string, any] | [string, string, string, any]>;
 	}> = [];
@@ -143,10 +144,31 @@ export function createSupabaseMock() {
 		return builder;
 	});
 
-	const rpc = vi.fn(async (_fn: string, _params?: any) => ({
-		data: null,
-		error: null,
-	}));
+	const rpc = vi.fn(async (fnName: string, params?: any) => {
+		// Registrar la llamada
+		calls.push({
+			table: "rpc",
+			op: "rpc" as Op,
+			method: "rpc",
+			args: { function: fnName, params },
+			filters: [],
+		});
+
+		// Buscar respuesta mockeada para este RPC
+		const key = `rpc:${fnName}`;
+		const responseArray = responses.get(key) || [];
+		const currentCount = callCounts.get(key) || 0;
+
+		// Si hay respuestas programadas, usar la siguiente en orden
+		if (responseArray.length > 0 && currentCount < responseArray.length) {
+			const res = responseArray[currentCount];
+			callCounts.set(key, currentCount + 1);
+			return res;
+		}
+
+		// Respuesta por defecto
+		return { data: null, error: null };
+	});
 
 	const auth = {
 		getUser: vi.fn(async () => ({ data: { user: null }, error: null })),

@@ -24,26 +24,25 @@ export const csvBinSchema = z.object({
 	"MÁS INFORMACIÓN": z.string(),
 });
 
-// Schema para datos de la base de datos (formato Bin)
+// Schema para datos de la base de datos (esquema real de Supabase)
 export const binSchema = z.object({
-	tipo_dato: z.string(),
-	lote: z.string(),
-	cod_dist: z.string(),
-	distrito: z.string(),
-	cod_barrio: z.string(),
-	barrio: z.string(),
-	direccion_completa: z.string(),
-	via_clase: z.string(),
-	via_par: z.string(),
-	via_nombre: z.string(),
-	tipo_numero: z.string(),
-	numero: z.string(),
-	latitud: z.number(),
-	longitud: z.number(),
-	direccion_completa_ampliada: z.string(),
-	mas_informacion: z.string(),
-	created_at: z.string().optional(),
-	updated_at: z.string().optional(),
+	id: z.number().int(),
+	category_group_id: z.number().int(),
+	category_id: z.number().int(),
+	district_id: z.number().int(),
+	neighborhood_id: z.number().int().nullable().optional(),
+	address: z.string(),
+	lat: z.number(),
+	lng: z.number(),
+	load_type: z.string().nullable().optional(),
+	direction: z.string().nullable().optional(),
+	subtype: z.string().nullable().optional(),
+	placement_type: z.string().nullable().optional(),
+	notes: z.string().nullable().optional(),
+	bus_stop: z.string().nullable().optional(),
+	interurban_node: z.string().nullable().optional(),
+	created_at: z.string(),
+	updated_at: z.string(),
 });
 
 // Schema para validar la respuesta jerárquica de conteos

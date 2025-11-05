@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { ERROR_MESSAGES } from "../constants/errorMessages";
+import { ERROR_MESSAGES } from "@/api/v1/bins/constants/errorMessages";
 
 /**
  * Mapea errores a códigos de estado HTTP apropiados

@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { VALID_BIN_TYPES } from "@/api/v1/bins/constants/binTypes";
+import { BIN_TYPES } from "@/api/v1/bins/constants/binTypes";
 import { ERROR_MESSAGES } from "@/api/v1/bins/constants/errorMessages";
 import { validateBinType } from "../binTypeValidation";
 
@@ -73,7 +73,7 @@ describe("validateBinType middleware", () => {
 		});
 
 		it("should work with all valid bin types", () => {
-			for (const binType of VALID_BIN_TYPES) {
+			for (const binType of BIN_TYPES) {
 				// Arrange
 				mockRequest.params = { binType };
 				vi.clearAllMocks();

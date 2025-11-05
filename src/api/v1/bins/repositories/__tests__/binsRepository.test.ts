@@ -151,7 +151,7 @@ describe("BinsRepository", () => {
 			const calls = supabaseMock.__getCalls();
 			expect(calls).toHaveLength(1);
 			expect(calls[0].table).toBe(binType);
-			expect(calls[0].filters).toContainEqual(["distrito", "eq", "CENTRO"]);
+			expect(calls[0].filters).toContainEqual(["district_id", "eq", "CENTRO"]);
 		});
 
 		it("should return bins by neighborhood", async () => {
@@ -178,7 +178,7 @@ describe("BinsRepository", () => {
 
 			const calls = supabaseMock.__getCalls();
 			expect(calls).toHaveLength(1);
-			expect(calls[0].filters).toContainEqual(["barrio", "eq", "PALACIO"]);
+			expect(calls[0].filters).toContainEqual(["neighborhood_id", "eq", "PALACIO"]);
 		});
 
 		it("should handle pagination correctly", async () => {
@@ -240,14 +240,15 @@ describe("BinsRepository", () => {
 				limit: 100,
 			};
 
-			// Mock bins con coordenadas
+			// Mock bins con coordenadas (usando RPC)
 			const binsWithCoords = mockBins.map((bin) => ({
 				...bin,
-				latitud: "40.4168",
-				longitud: "-3.7038",
+				lat: 40.4168,
+				lng: -3.7038,
+				distance_km: 0.5,
 			}));
 
-			supabaseMock.__setResponse(binType, "select", {
+			supabaseMock.__setResponse("rpc", "find_nearby_bins" as any, {
 				data: binsWithCoords,
 				error: null,
 			});
@@ -257,14 +258,13 @@ describe("BinsRepository", () => {
 
 			// Assert
 			expect(result).toHaveLength(2); // mockBins tiene 2 elementos
-			expect(result[0]).toHaveProperty("latitud");
-			expect(result[0]).toHaveProperty("longitud");
+			expect(result[0]).toHaveProperty("lat");
+			expect(result[0]).toHaveProperty("lng");
+			expect(result[0]).not.toHaveProperty("distance_km"); // Se remueve antes de devolver
 
 			const calls = supabaseMock.__getCalls();
 			expect(calls).toHaveLength(1);
-			expect(calls[0].table).toBe(binType);
-			expect(calls[0].filters).toContainEqual(["latitud", "not", "is", null]);
-			expect(calls[0].filters).toContainEqual(["longitud", "not", "is", null]);
+			expect(calls[0].method).toBe("rpc");
 		});
 
 		it("should filter out bins without coordinates", async () => {
@@ -277,15 +277,9 @@ describe("BinsRepository", () => {
 				limit: 100,
 			};
 
-			// Mock bins sin coordenadas
-			const binsWithoutCoords = mockBins.map((bin) => ({
-				...bin,
-				latitud: null,
-				longitud: null,
-			}));
-
-			supabaseMock.__setResponse(binType, "select", {
-				data: binsWithoutCoords,
+			// La función PostgreSQL ya filtra bins sin coordenadas
+			supabaseMock.__setResponse("rpc", "find_nearby_bins" as any, {
+				data: [], // PostgreSQL no devuelve bins sin coordenadas
 				error: null,
 			});
 
@@ -307,7 +301,7 @@ describe("BinsRepository", () => {
 			};
 			const errorMessage = TEST_ERROR_MESSAGES.GEOSPATIAL_QUERY_FAILED;
 
-			supabaseMock.__setResponse(binType, "select", {
+			supabaseMock.__setResponse("rpc", "find_nearby_bins" as any, {
 				data: null,
 				error: { message: errorMessage },
 			});
@@ -324,10 +318,10 @@ describe("BinsRepository", () => {
 			// Arrange
 			const binType = "clothing_bins";
 			const mockData = [
-				{ distrito: "CENTRO", barrio: "PALACIO" },
-				{ distrito: "CENTRO", barrio: "PALACIO" },
-				{ distrito: "CENTRO", barrio: "CHUECA" },
-				{ distrito: "CHAMARTIN", barrio: "ELVISCO" },
+				{ district_id: 1, neighborhood_id: 5 },
+				{ district_id: 1, neighborhood_id: 5 },
+				{ district_id: 1, neighborhood_id: 4 },
+				{ district_id: 5, neighborhood_id: 31 },
 			];
 
 			supabaseMock.__setResponse(binType, "select", {
@@ -340,15 +334,15 @@ describe("BinsRepository", () => {
 
 			// Assert
 			expect(result).toEqual([
-				{ distrito: "CENTRO", barrio: "PALACIO", count: 2 },
-				{ distrito: "CENTRO", barrio: "CHUECA", count: 1 },
-				{ distrito: "CHAMARTIN", barrio: "ELVISCO", count: 1 },
+				{ distrito: "1", barrio: "5", count: 2 },
+				{ distrito: "1", barrio: "4", count: 1 },
+				{ distrito: "5", barrio: "31", count: 1 },
 			]);
 
 			const calls = supabaseMock.__getCalls();
 			expect(calls).toHaveLength(1);
 			expect(calls[0].table).toBe(binType);
-			expect(calls[0].args.select).toBe("distrito, barrio");
+			expect(calls[0].args.select).toBe("district_id, neighborhood_id");
 		});
 
 		it("should return empty array when no data", async () => {

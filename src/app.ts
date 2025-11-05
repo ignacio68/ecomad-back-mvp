@@ -1,7 +1,7 @@
+import { createServer, type Server } from "node:http";
 import cors from "cors";
 import express, { type Express } from "express";
 import helmet from "helmet";
-import { createServer, type Server } from "http";
 import { pino } from "pino";
 import { apiRouter } from "@/api/apiRouter";
 import { openAPIRouter } from "@/api-docs/openAPIRouter";
@@ -77,6 +77,28 @@ app.use((req, res, next) => {
 	next();
 });
 
+// Root endpoint - Redirección a documentación
+app.get("/", (_req, res) => {
+	res.status(200).json({
+		message: "🌱 Bienvenido a EcoMAD API",
+		version: "1.0.0",
+		description: "API REST para contenedores de reciclaje en Madrid",
+		totalBins: 37510,
+		documentation: {
+			swagger: `${_req.protocol}://${_req.get("host")}/api-docs`,
+			info: `${_req.protocol}://${_req.get("host")}/api/info`,
+			health: `${_req.protocol}://${_req.get("host")}/health`,
+		},
+		quickStart: {
+			"Obtener conteo": `GET ${_req.protocol}://${_req.get("host")}/api/v1/bins/clothing_bins/count`,
+			Cercanos: `GET ${_req.protocol}://${_req.get(
+				"host",
+			)}/api/v1/bins/clothing_bins/nearby?lat=40.4168&lng=-3.7038&radius=2`,
+			"Por distrito": `GET ${_req.protocol}://${_req.get("host")}/api/v1/bins/glass_bins/location/district/1`,
+		},
+	});
+});
+
 // Health check endpoint (antes de otras rutas para mejor performance)
 app.get("/health", (_req, res) => {
 	res.status(200).json({
@@ -93,6 +115,40 @@ app.use("/api", apiRouter);
 
 // Swagger UI
 app.use("/api-docs", openAPIRouter);
+
+// Servir OpenAPI JSON directamente desde el root también
+app.get("/swagger.json", (_req, res) => {
+	res.redirect("/api-docs/swagger.json");
+});
+
+// Endpoint para obtener información rápida de la API
+app.get("/api/info", (_req, res) => {
+	res.status(200).json({
+		name: "EcoMAD API",
+		version: "1.0.0",
+		description: "API REST para la gestión de contenedores de reciclaje en Madrid",
+		endpoints: {
+			health: "/health",
+			documentation: "/api-docs",
+			swagger: "/swagger.json",
+			api: "/api/v1",
+		},
+		binTypes: {
+			clothing_bins: { description: "Ropa y textil", total: 1175 },
+			oil_bins: { description: "Aceite vegetal usado", total: 90 },
+			glass_bins: { description: "Vidrio con publicidad", total: 7441 },
+			paper_bins: { description: "Papel y cartón", total: 7320 },
+			plastic_bins: {
+				description: "Envases (plástico, metal, brik)",
+				total: 6846,
+			},
+			organic_bins: { description: "Residuos orgánicos", total: 6685 },
+			battery_bins: { description: "Pilas (mupis/marquesinas)", total: 1231 },
+			other_bins: { description: "Resto (no reciclables)", total: 6722 },
+		},
+		totalBins: 37510,
+	});
+});
 
 // Middleware para forzar el envío del body en códigos 204
 app.use((req, res, next) => {

@@ -1,10 +1,10 @@
 import type { Request, RequestHandler, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { validateCSV } from "@/api/common/utils/validateCSV";
+import { ERROR_MESSAGES } from "@/api/v1/bins/constants/errorMessages";
+import { SUCCESS_MESSAGES } from "@/api/v1/bins/constants/successMessages";
+import { csvBinSchema } from "@/api/v1/bins/schemas/binsSchema";
 import { ServiceResponse } from "@/shared/models/serviceResponse";
-import { ERROR_MESSAGES } from "../constants/errorMessages";
-import { SUCCESS_MESSAGES } from "../constants/successMessages";
-import { csvBinSchema } from "../schemas/binsSchema";
 import {
 	clearBins,
 	getAllBins,

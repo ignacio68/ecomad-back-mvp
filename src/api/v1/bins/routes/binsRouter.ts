@@ -1,5 +1,4 @@
 import express, { type Router } from "express";
-import rateLimiter from "@/shared/middleware/rateLimiter";
 import {
 	debugBinsController,
 	getBins,
@@ -8,8 +7,9 @@ import {
 	getBinsCountsHierarchyController,
 	getBinsNearbyController,
 	loadBinsDataController,
-} from "../controllers/binsController";
-import { validateBinType } from "../middleware/binTypeValidation";
+} from "@/api/v1/bins/controllers/binsController";
+import { validateBinType } from "@/api/v1/bins/middleware/binTypeValidation";
+import rateLimiter from "@/shared/middleware/rateLimiter";
 
 // Validaciones movidas a servicios/controllers
 

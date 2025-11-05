@@ -1,0 +1,62 @@
+[
+	{
+		"id": 1,
+		"tipo": "Contenedores",
+		"subcategorías": [
+			{
+				"id": 11,
+				"tipo": "Vidrio"
+			},
+			{
+				"id": 12,
+				"tipo": "Papel"
+			},
+			{
+				"id": 13,
+				"tipo": "Plástico"
+			},
+			{
+				"id": 14,
+				"tipo": "Ropa"
+			},
+			{
+				"id": 15,
+				"tipo": "Aceite"
+			},
+			{
+				"id": 16,
+				"tipo": "Orgánico"
+			},
+			{
+				"id": 17,
+				"tipo": "Pilas"
+			},
+			{
+				"id": 18,
+				"tipo": "Otros"
+			}
+		]
+	},
+	{
+		"id": 2,
+		"tipo": "Puntos limpios",
+		"subcategorías": [
+			{
+				"id": 21,
+				"tipo": "Fijos"
+			},
+			{
+				"id": 22,
+				"tipo": "Móviles"
+			},
+			{
+				"id": 23,
+				"tipo": "Proximidad"
+			},
+			{
+				"id": 24,
+				"tipo": "24 horas"
+			}
+		]
+	}
+]

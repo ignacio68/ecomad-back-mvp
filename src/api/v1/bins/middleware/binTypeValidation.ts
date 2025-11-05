@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { VALID_BIN_TYPES } from "@/api/v1/bins/constants/binTypes";
+import { BIN_TYPES } from "@/api/v1/bins/constants/binTypes";
 import { ERROR_MESSAGES } from "@/api/v1/bins/constants/errorMessages";
 import type { BinType } from "@/api/v1/bins/types/binTypes";
 import { ServiceResponse } from "@/shared/models/serviceResponse";
@@ -35,7 +35,7 @@ export const validateBinType = (req: Request, res: Response, next: NextFunction)
 			return;
 		}
 
-		if (!VALID_BIN_TYPES.includes(binType as BinType)) {
+		if (!BIN_TYPES.includes(binType as BinType)) {
 			const response = ServiceResponse.failure(ERROR_MESSAGES.INVALID_BIN_TYPE, null);
 			res.status(400).json(response);
 			return;

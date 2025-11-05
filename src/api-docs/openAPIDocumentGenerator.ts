@@ -7,6 +7,72 @@ export type OpenAPIDocument = ReturnType<OpenApiGeneratorV3["generateDocument"]>
 export function generateOpenAPIDocument(): OpenAPIDocument {
 	const registry = new OpenAPIRegistry();
 
+	// Registrar schemas globales primero
+	registry.register(
+		"Bin",
+		z.object({
+			id: z.number().openapi({ example: 12947, description: "ID único del contenedor" }),
+			category_group_id: z.number().openapi({ example: 1, description: "ID del grupo de categoría" }),
+			category_id: z.number().openapi({ example: 14, description: "ID de la categoría específica" }),
+			district_id: z.number().openapi({ example: 1, description: "ID del distrito (1-35)" }),
+			neighborhood_id: z.number().nullable().openapi({
+				example: 5,
+				description: "ID del barrio (1-218) - opcional",
+			}),
+			address: z.string().openapi({
+				example: "CALLE DEL DESENGAÑO, 16",
+				description: "Dirección completa",
+			}),
+			lat: z.number().openapi({ example: 40.42091, description: "Latitud (WGS84)" }),
+			lng: z.number().openapi({ example: -3.70348, description: "Longitud (WGS84)" }),
+			load_type: z.string().nullable().openapi({ example: null, description: "Tipo de carga - opcional" }),
+			direction: z.string().nullable().openapi({
+				example: null,
+				description: "Dirección adicional - opcional",
+			}),
+			subtype: z.string().nullable().openapi({
+				example: "Contenedor superficie",
+				description: "Subtipo - opcional",
+			}),
+			placement_type: z.string().nullable().openapi({
+				example: null,
+				description: "Tipo de emplazamiento - opcional",
+			}),
+			notes: z.string().nullable().openapi({
+				example: "Además se puede depositar ropa usada en los puntos limpios fijos y móviles",
+				description: "Notas adicionales - opcional",
+			}),
+			bus_stop: z.string().nullable().openapi({
+				example: null,
+				description: "Parada de bus (solo battery_bins)",
+			}),
+			interurban_node: z.string().nullable().openapi({
+				example: null,
+				description: "Nodo interurbano (solo battery_bins)",
+			}),
+			created_at: z.string().openapi({
+				example: "2025-11-05T14:10:46.524733+00:00",
+				description: "Fecha de creación (ISO 8601)",
+			}),
+			updated_at: z.string().openapi({
+				example: "2025-11-05T14:12:16.932091+00:00",
+				description: "Fecha de actualización (ISO 8601)",
+			}),
+		}),
+	);
+
+	registry.register(
+		"HierarchyCount",
+		z.object({
+			distrito: z.string().openapi({ example: "1", description: "ID del distrito (1-35)" }),
+			barrio: z.string().openapi({ example: "5", description: "ID del barrio (1-218)" }),
+			count: z.number().openapi({
+				example: 17,
+				description: "Número de contenedores en el barrio",
+			}),
+		}),
+	);
+
 	// Schema para Health Check
 	const HealthResponse = z
 		.object({
@@ -62,13 +128,18 @@ API REST para la gestión de contenedores de reciclaje en la ciudad de Madrid.
 
 ## Tipos de contenedores soportados
 
-- \`clothing_bins\`: Contenedores de ropa
-- \`oil_bins\`: Contenedores de aceite usado
-- \`glass_bins\`: Contenedores de vidrio
-- \`paper_bins\`: Contenedores de papel y cartón
-- \`plastic_bins\`: Contenedores de plástico
-- \`organic_bins\`: Contenedores de orgánicos
-- \`other_bins\`: Contenedores de otros materiales
+| Tipo | Descripción | Total |
+|------|-------------|-------|
+| \`clothing_bins\` | Contenedores de ropa y textil | 1,175 |
+| \`oil_bins\` | Contenedores de aceite vegetal usado | 90 |
+| \`glass_bins\` | Contenedores de vidrio con publicidad | 7,441 |
+| \`paper_bins\` | Contenedores de papel y cartón | 7,320 |
+| \`plastic_bins\` | Contenedores de envases (plástico, metal, brik) | 6,846 |
+| \`organic_bins\` | Contenedores de residuos orgánicos | 6,685 |
+| \`battery_bins\` | Puntos de recogida de pilas (mupis/marquesinas) | 1,231 |
+| \`other_bins\` | Contenedores de resto (residuos no reciclables) | 6,722 |
+
+**Total: 37,510 contenedores** en toda la ciudad de Madrid
 
 ## Autenticación
 
@@ -81,7 +152,7 @@ Esta API no requiere autenticación para las operaciones de lectura.
 
 ## Respuestas
 
-Todas las respuestas siguen el formato estándar:
+Todas las respuestas siguen el formato \`ServiceResponse\`:
 
 \`\`\`json
 {
@@ -89,6 +160,24 @@ Todas las respuestas siguen el formato estándar:
   "message": string,
   "responseObject": object | null,
   "statusCode": number
+}
+\`\`\`
+
+Ejemplo de respuesta exitosa:
+\`\`\`json
+{
+  "success": true,
+  "message": "Contenedores obtenidos exitosamente",
+  "responseObject": [{
+    "id": 12947,
+    "district_id": 1,
+    "neighborhood_id": 5,
+    "address": "CALLE DEL DESENGAÑO, 16",
+    "lat": 40.42091,
+    "lng": -3.70348,
+    ...
+  }],
+  "statusCode": 200
 }
 \`\`\`
 
