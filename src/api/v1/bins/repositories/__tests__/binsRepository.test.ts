@@ -20,8 +20,13 @@ describe("BinsRepository", () => {
 		it("should return all bins from database", async () => {
 			// Arrange
 			const binType = "clothing_bins";
+			const binsWithIds = [
+				{ ...mockBins[0], id: 1 },
+				{ ...mockBins[1], id: 2 },
+			];
+
 			supabaseMock.__setResponse(binType, "select", {
-				data: mockBins,
+				data: binsWithIds,
 				error: null,
 			});
 
@@ -29,7 +34,8 @@ describe("BinsRepository", () => {
 			const result = await repository.findAll(binType);
 
 			// Assert
-			expect(result).toEqual(mockBins);
+			expect(result).toEqual(binsWithIds);
+			expect(result).toHaveLength(2); // Sin duplicados
 			expect(supabaseMock.__getCalls()).toHaveLength(1);
 
 			const call = supabaseMock.__getCalls()[0];

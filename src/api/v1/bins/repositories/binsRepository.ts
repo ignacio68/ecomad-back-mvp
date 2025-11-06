@@ -14,6 +14,7 @@ export class BinsRepository {
 	 */
 	async findAll(binType: string): Promise<BinRecord[]> {
 		const allData: BinRecord[] = [];
+		const seenIds = new Set<number>(); // Track IDs para evitar duplicados
 		const pageSize = 1000;
 		let offset = 0;
 		let hasMore = true;
@@ -22,8 +23,7 @@ export class BinsRepository {
 			const { data, error } = await supabase
 				.from(binType)
 				.select("*")
-				.order("district_id", { ascending: true })
-				.order("neighborhood_id", { ascending: true })
+				.order("id", { ascending: true }) // Ordenar por ID para paginación consistente
 				.range(offset, offset + pageSize - 1);
 
 			if (error) {
@@ -31,7 +31,16 @@ export class BinsRepository {
 			}
 
 			if (data && data.length > 0) {
-				allData.push(...data);
+				// Filtrar duplicados antes de añadir
+				const uniqueData = data.filter((record) => {
+					if (seenIds.has(record.id)) {
+						return false;
+					}
+					seenIds.add(record.id);
+					return true;
+				});
+
+				allData.push(...uniqueData);
 				offset += pageSize;
 				hasMore = data.length === pageSize; // Si obtenemos menos de pageSize, no hay más datos
 			} else {
