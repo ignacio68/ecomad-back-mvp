@@ -1,179 +1,212 @@
 import { supabase } from "@/api/common/lib/supabase";
 import { ERROR_MESSAGES } from "@/api/v1/bins/constants/errorMessages";
-import type { CountsHierarchyResult, InsertManyResult } from "@/api/v1/bins/repositories/types";
-import type { BinRecord, LocationParams, NearbyParams } from "@/api/v1/bins/types/binTypes";
+import type {
+  CountsHierarchyResult,
+  InsertManyResult,
+} from "@/api/v1/bins/repositories/types";
+import type {
+  BinRecord,
+  LocationParams,
+  NearbyParams,
+} from "@/api/v1/bins/types/binTypes";
 
 /**
  * Repository para operaciones de datos con Supabase
  * Maneja únicamente el acceso a datos, sin lógica de negocio
  */
 export class BinsRepository {
-	/**
-	 * Obtiene todos los contenedores de un tipo específico
-	 * Usa paginación para obtener todos los registros (Supabase limita a 1000 por defecto)
-	 */
-	async findAll(binType: string): Promise<BinRecord[]> {
-		const allData: BinRecord[] = [];
-		const seenIds = new Set<number>(); // Track IDs para evitar duplicados
-		const pageSize = 1000;
-		let offset = 0;
-		let hasMore = true;
+  /**
+   * Obtiene todos los contenedores de un tipo específico
+   * Usa paginación para obtener todos los registros (Supabase limita a 1000 por defecto)
+   */
+  async findAll(binType: string): Promise<BinRecord[]> {
+    const allData: BinRecord[] = [];
+    const seenIds = new Set<number>(); // Track IDs para evitar duplicados
+    const pageSize = 1000;
+    let offset = 0;
+    let hasMore = true;
 
-		while (hasMore) {
-			const { data, error } = await supabase
-				.from(binType)
-				.select("*")
-				.order("id", { ascending: true }) // Ordenar por ID para paginación consistente
-				.range(offset, offset + pageSize - 1);
+    while (hasMore) {
+      const { data, error } = await supabase
+        .from(binType)
+        .select("*")
+        .order("id", { ascending: true }) // Ordenar por ID para paginación consistente
+        .range(offset, offset + pageSize - 1);
 
-			if (error) {
-				throw new Error(`${ERROR_MESSAGES.DATABASE_QUERY_FAILED}: ${error.message}`);
-			}
+      if (error) {
+        throw new Error(
+          `${ERROR_MESSAGES.DATABASE_QUERY_FAILED}: ${error.message}`
+        );
+      }
 
-			if (data && data.length > 0) {
-				// Filtrar duplicados antes de añadir
-				const uniqueData = data.filter((record) => {
-					if (seenIds.has(record.id)) {
-						return false;
-					}
-					seenIds.add(record.id);
-					return true;
-				});
+      if (data && data.length > 0) {
+        // Filtrar duplicados antes de añadir
+        const uniqueData = data.filter(record => {
+          if (seenIds.has(record.id)) {
+            return false;
+          }
+          seenIds.add(record.id);
+          return true;
+        });
 
-				allData.push(...uniqueData);
-				offset += pageSize;
-				hasMore = data.length === pageSize; // Si obtenemos menos de pageSize, no hay más datos
-			} else {
-				hasMore = false;
-			}
-		}
+        allData.push(...uniqueData);
+        offset += pageSize;
+        hasMore = data.length === pageSize; // Si obtenemos menos de pageSize, no hay más datos
+      } else {
+        hasMore = false;
+      }
+    }
 
-		return allData;
-	}
+    return allData;
+  }
 
-	/**
-	 * Cuenta el total de contenedores de un tipo específico
-	 */
-	async count(binType: string): Promise<number> {
-		const { count, error } = await supabase.from(binType).select("*", { count: "exact", head: true });
+  /**
+   * Cuenta el total de contenedores de un tipo específico
+   */
+  async count(binType: string): Promise<number> {
+    const { count, error } = await supabase
+      .from(binType)
+      .select("*", { count: "exact", head: true });
 
-		if (error) {
-			throw new Error(`${ERROR_MESSAGES.DATABASE_QUERY_FAILED}: ${error.message}`);
-		}
+    if (error) {
+      throw new Error(
+        `${ERROR_MESSAGES.DATABASE_QUERY_FAILED}: ${error.message}`
+      );
+    }
 
-		return count || 0;
-	}
+    return count || 0;
+  }
 
-	/**
-	 * Obtiene contenedores por ubicación (distrito o barrio)
-	 */
-	async findByLocation(binType: string, params: LocationParams): Promise<BinRecord[]> {
-		const { locationType, locationValue, page = 1, limit = 100 } = params;
-		const offset = (page - 1) * limit;
-		const columnName = locationType === "district" ? "district_id" : "neighborhood_id";
+  /**
+   * Obtiene contenedores por ubicación (distrito o barrio)
+   */
+  async findByLocation(
+    binType: string,
+    params: LocationParams
+  ): Promise<BinRecord[]> {
+    const { locationType, locationValue, page = 1, limit = 100 } = params;
+    const offset = (page - 1) * limit;
+    const columnName =
+      locationType === "district" ? "district_id" : "neighborhood_id";
 
-		const { data, error } = await supabase
-			.from(binType)
-			.select("*")
-			.eq(columnName, locationValue)
-			.order("district_id", { ascending: true })
-			.order("neighborhood_id", { ascending: true })
-			.range(offset, offset + limit - 1);
+    const { data, error } = await supabase
+      .from(binType)
+      .select("*")
+      .eq(columnName, locationValue)
+      .order("district_id", { ascending: true })
+      .order("neighborhood_id", { ascending: true })
+      .range(offset, offset + limit - 1);
 
-		if (error) {
-			throw new Error(`${ERROR_MESSAGES.DATABASE_QUERY_FAILED}: ${error.message}`);
-		}
+    if (error) {
+      throw new Error(
+        `${ERROR_MESSAGES.DATABASE_QUERY_FAILED}: ${error.message}`
+      );
+    }
 
-		return data || [];
-	}
+    return data || [];
+  }
 
-	/**
-	 * Obtiene contenedores cercanos a una coordenada
-	 * Usa la función PostgreSQL find_nearby_bins con earthdistance extension
-	 */
-	async findNearby(binType: string, params: NearbyParams): Promise<BinRecord[]> {
-		const { lat, lng, radius, limit = 100 } = params;
+  /**
+   * Obtiene contenedores cercanos a una coordenada
+   * Usa la función PostgreSQL find_nearby_bins con earthdistance extension
+   */
+  async findNearby(
+    binType: string,
+    params: NearbyParams
+  ): Promise<BinRecord[]> {
+    const { lat, lng, radius, limit = 100 } = params;
 
-		// Llamar a la función PostgreSQL optimizada
-		const { data, error } = await supabase.rpc("find_nearby_bins", {
-			p_table_name: binType,
-			p_lat: lat,
-			p_lng: lng,
-			p_radius_km: radius,
-			p_limit: limit,
-		});
+    // Llamar a la función PostgreSQL optimizada
+    const { data, error } = await supabase.rpc("find_nearby_bins", {
+      p_table_name: binType,
+      p_lat: lat,
+      p_lng: lng,
+      p_radius_km: radius,
+      p_limit: limit,
+    });
 
-		if (error) {
-			throw new Error(`${ERROR_MESSAGES.DATABASE_QUERY_FAILED}: ${error.message}`);
-		}
+    if (error) {
+      throw new Error(
+        `${ERROR_MESSAGES.DATABASE_QUERY_FAILED}: ${error.message}`
+      );
+    }
 
-		// La función ya devuelve los bins ordenados por distancia
-		// Remover el campo distance_km antes de devolver (es solo para ordenar)
-		return (data || []).map(({ distance_km: _distance, ...bin }: any) => bin) as BinRecord[];
-	}
+    // La función ya devuelve los bins ordenados por distancia
+    // Remover el campo distance_km antes de devolver (es solo para ordenar)
+    return (data || []).map(
+      ({ distance_km: _distance, ...bin }: any) => bin
+    ) as BinRecord[];
+  }
 
-	/**
-	 * Obtiene conteos jerárquicos por distrito y barrio
-	 * Usa agregación SQL nativa de PostgreSQL para mejor performance
-	 */
-	async getCountsHierarchy(binType: string): Promise<CountsHierarchyResult[]> {
-		// Usar RPC para ejecutar agregación SQL nativa
-		const { data, error } = await supabase.rpc("get_bins_counts_hierarchy", {
-			p_table_name: binType,
-		});
+  /**
+   * Obtiene conteos jerárquicos por distrito y barrio
+   * Usa agregación SQL nativa de PostgreSQL para mejor performance
+   */
+  async getCountsHierarchy(binType: string): Promise<CountsHierarchyResult[]> {
+    // Usar RPC para ejecutar agregación SQL nativa
+    const { data, error } = await supabase.rpc("get_bins_counts_hierarchy", {
+      p_table_name: binType,
+    });
 
-		if (error) {
-			throw new Error(`${ERROR_MESSAGES.DATABASE_QUERY_FAILED}: ${error.message}`);
-		}
+    if (error) {
+      throw new Error(
+        `${ERROR_MESSAGES.DATABASE_QUERY_FAILED}: ${error.message}`
+      );
+    }
 
-		if (!data) return [];
+    if (!data) return [];
 
-		// Los datos ya vienen agrupados y contados desde PostgreSQL
-		return data.map((item: any) => ({
-			distrito: item.distrito.toString(),
-			barrio: item.barrio ? item.barrio.toString() : "",
-			count: item.count,
-		}));
-	}
+    // Los datos ya vienen agrupados y contados desde PostgreSQL
+    return data.map((item: any) => ({
+      distrito: item.distrito.toString(),
+      barrio: item.barrio ? item.barrio.toString() : "",
+      count: item.count,
+    }));
+  }
 
-	/**
-	 * Inserta múltiples contenedores
-	 */
-	async insertMany(binType: string, bins: BinRecord[]): Promise<InsertManyResult> {
-		const batchSize = 1000;
-		const errors: Array<{ batch: number; error: unknown }> = [];
-		let totalInserted = 0;
+  /**
+   * Inserta múltiples contenedores
+   */
+  async insertMany(
+    binType: string,
+    bins: BinRecord[]
+  ): Promise<InsertManyResult> {
+    const batchSize = 1000;
+    const errors: Array<{ batch: number; error: unknown }> = [];
+    let totalInserted = 0;
 
-		for (let i = 0; i < bins.length; i += batchSize) {
-			const batch = bins.slice(i, i + batchSize);
-			const batchNumber = Math.floor(i / batchSize) + 1;
+    for (let i = 0; i < bins.length; i += batchSize) {
+      const batch = bins.slice(i, i + batchSize);
+      const batchNumber = Math.floor(i / batchSize) + 1;
 
-			try {
-				const { error } = await supabase.from(binType).insert(batch);
+      try {
+        const { error } = await supabase.from(binType).insert(batch);
 
-				if (error) {
-					errors.push({ batch: batchNumber, error });
-				} else {
-					totalInserted += batch.length;
-				}
-			} catch (err) {
-				errors.push({ batch: batchNumber, error: err });
-			}
-		}
+        if (error) {
+          errors.push({ batch: batchNumber, error });
+        } else {
+          totalInserted += batch.length;
+        }
+      } catch (err) {
+        errors.push({ batch: batchNumber, error: err });
+      }
+    }
 
-		return { inserted: totalInserted, errors };
-	}
+    return { inserted: totalInserted, errors };
+  }
 
-	/**
-	 * Elimina todos los contenedores de un tipo específico
-	 */
-	async deleteAll(binType: string): Promise<void> {
-		const { error } = await supabase.from(binType).delete().neq("id", 0); // Eliminar todos los registros
+  /**
+   * Elimina todos los contenedores de un tipo específico
+   */
+  async deleteAll(binType: string): Promise<void> {
+    const { error } = await supabase.from(binType).delete().neq("id", 0); // Eliminar todos los registros
 
-		if (error) {
-			throw new Error(`${ERROR_MESSAGES.DATA_DELETION_FAILED}: ${error.message}`);
-		}
-	}
+    if (error) {
+      throw new Error(
+        `${ERROR_MESSAGES.DATA_DELETION_FAILED}: ${error.message}`
+      );
+    }
+  }
 }
 
 // Instancia singleton del repository
