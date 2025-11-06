@@ -114,9 +114,13 @@ export class BinsRepository {
 
 	/**
 	 * Obtiene conteos jerárquicos por distrito y barrio
+	 * Usa agregación SQL nativa de PostgreSQL para mejor performance
 	 */
 	async getCountsHierarchy(binType: string): Promise<CountsHierarchyResult[]> {
-		const { data, error } = await supabase.from(binType).select("district_id, neighborhood_id");
+		// Usar RPC para ejecutar agregación SQL nativa
+		const { data, error } = await supabase.rpc("get_bins_counts_hierarchy", {
+			p_table_name: binType,
+		});
 
 		if (error) {
 			throw new Error(`${ERROR_MESSAGES.DATABASE_QUERY_FAILED}: ${error.message}`);
@@ -124,22 +128,12 @@ export class BinsRepository {
 
 		if (!data) return [];
 
-		// Agrupar y contar
-		const counts = new Map<string, number>();
-		data.forEach((bin) => {
-			const key = `${bin.district_id}-${bin.neighborhood_id || "null"}`;
-			counts.set(key, (counts.get(key) || 0) + 1);
-		});
-
-		// Convertir a array con nombres de distrito y barrio (IDs por ahora)
-		return Array.from(counts.entries()).map(([key, count]) => {
-			const [districtId, neighborhoodId] = key.split("-");
-			return {
-				distrito: districtId,
-				barrio: neighborhoodId === "null" ? "" : neighborhoodId,
-				count,
-			};
-		});
+		// Los datos ya vienen agrupados y contados desde PostgreSQL
+		return data.map((item: any) => ({
+			distrito: item.distrito.toString(),
+			barrio: item.barrio ? item.barrio.toString() : "",
+			count: item.count,
+		}));
 	}
 
 	/**

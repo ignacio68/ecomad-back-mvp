@@ -323,15 +323,15 @@ describe("BinsRepository", () => {
 		it("should return counts grouped by district and neighborhood", async () => {
 			// Arrange
 			const binType = "clothing_bins";
-			const mockData = [
-				{ district_id: 1, neighborhood_id: 5 },
-				{ district_id: 1, neighborhood_id: 5 },
-				{ district_id: 1, neighborhood_id: 4 },
-				{ district_id: 5, neighborhood_id: 31 },
+			// Mock datos ya agregados por PostgreSQL
+			const mockAggregatedData = [
+				{ distrito: 1, barrio: 5, count: 2 },
+				{ distrito: 1, barrio: 4, count: 1 },
+				{ distrito: 5, barrio: 31, count: 1 },
 			];
 
-			supabaseMock.__setResponse(binType, "select", {
-				data: mockData,
+			supabaseMock.__setResponse("rpc", "get_bins_counts_hierarchy" as any, {
+				data: mockAggregatedData,
 				error: null,
 			});
 
@@ -347,14 +347,15 @@ describe("BinsRepository", () => {
 
 			const calls = supabaseMock.__getCalls();
 			expect(calls).toHaveLength(1);
-			expect(calls[0].table).toBe(binType);
-			expect(calls[0].args.select).toBe("district_id, neighborhood_id");
+			expect(calls[0].method).toBe("rpc");
+			expect(calls[0].args.function).toBe("get_bins_counts_hierarchy");
+			expect(calls[0].args.params.p_table_name).toBe(binType);
 		});
 
 		it("should return empty array when no data", async () => {
 			// Arrange
 			const binType = "clothing_bins";
-			supabaseMock.__setResponse(binType, "select", {
+			supabaseMock.__setResponse("rpc", "get_bins_counts_hierarchy" as any, {
 				data: null,
 				error: null,
 			});
@@ -371,7 +372,7 @@ describe("BinsRepository", () => {
 			const binType = "clothing_bins";
 			const errorMessage = TEST_ERROR_MESSAGES.AGGREGATION_FAILED;
 
-			supabaseMock.__setResponse(binType, "select", {
+			supabaseMock.__setResponse("rpc", "get_bins_counts_hierarchy" as any, {
 				data: null,
 				error: { message: errorMessage },
 			});
