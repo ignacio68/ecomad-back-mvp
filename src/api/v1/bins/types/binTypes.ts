@@ -9,8 +9,8 @@ export interface BinRecord {
 	id: number;
 	category_group_id: number;
 	category_id: number;
-	district_id: number;
-	neighborhood_id?: number | null;
+	district_code: string; // Código del distrito como "01", "02", etc.
+	neighborhood_code?: string | null; // Código del barrio como "011", "012", etc.
 	address: string;
 	lat: number | string; // Numeric en Supabase se devuelve como string
 	lng: number | string; // Numeric en Supabase se devuelve como string

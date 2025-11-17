@@ -235,8 +235,8 @@ GET /api/v1/bins/{binType}
       "id": 12947,
       "category_group_id": 1,
       "category_id": 14,
-      "district_id": 1,
-      "neighborhood_id": 2,
+      "district_code": 1,
+      "neighborhood_code": 2,
       "address": "CALLE DE ATOCHA, 108",
       "lat": 40.4098,
       "lng": -3.69396,
@@ -463,8 +463,8 @@ interface BinRecord {
   id: number; // ID único del contenedor
   category_group_id: number; // ID del grupo de categoría
   category_id: number; // ID de la categoría específica
-  district_id: number; // ID del distrito (1-35)
-  neighborhood_id: number | null; // ID del barrio (1-218) - opcional
+  district_code: number; // ID del distrito (1-35)
+  neighborhood_code: number | null; // ID del barrio (1-218) - opcional
   address: string; // Dirección completa
   lat: number; // Latitud (WGS84)
   lng: number; // Longitud (WGS84)
@@ -524,8 +524,8 @@ interface BinRecord {
   address: string;
   lat: number;
   lng: number;
-  district_id: number;
-  neighborhood_id: number | null;
+  district_code: number;
+  neighborhood_code: number | null;
   notes: string | null;
   // ... otros campos
 }

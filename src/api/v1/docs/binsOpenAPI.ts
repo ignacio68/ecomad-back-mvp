@@ -18,8 +18,14 @@ export const BinSchema = z
 		id: z.number().openapi({ example: 12947, description: "ID único del contenedor" }),
 		category_group_id: z.number().openapi({ example: 1, description: "ID del grupo de categoría" }),
 		category_id: z.number().openapi({ example: 14, description: "ID de la categoría específica" }),
-		district_id: z.number().openapi({ example: 1, description: "ID del distrito (1-35)" }),
-		neighborhood_id: z.number().nullable().openapi({ example: 5, description: "ID del barrio (1-218) - opcional" }),
+		district_code: z.string().openapi({
+			example: "01",
+			description: 'Código del distrito ("01"-"21")',
+		}),
+		neighborhood_code: z.string().nullable().openapi({
+			example: "011",
+			description: 'Código del barrio ("011", "012", etc.) - opcional',
+		}),
 		address: z.string().openapi({
 			example: "CALLE DEL DESENGAÑO, 16",
 			description: "Dirección completa",

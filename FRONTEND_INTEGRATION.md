@@ -25,8 +25,8 @@ interface BinRecord {
   id: number;
   category_group_id: number;
   category_id: number;
-  district_id: number;
-  neighborhood_id: number | null;
+  district_code: number;
+  neighborhood_code: number | null;
   address: string;
   lat: number;
   lng: number;
@@ -369,7 +369,7 @@ export function NearbyBinsMap() {
             coordinate={{ latitude: bin.lat, longitude: bin.lng }}
             pinColor="green"
             title={bin.address}
-            description={`Distrito: ${bin.district_id} | Barrio: ${bin.neighborhood_id}`}
+            description={`Distrito: ${bin.district_code} | Barrio: ${bin.neighborhood_code}`}
           />
         ))}
       </MapView>
@@ -421,7 +421,7 @@ export function NearbyBinsMap() {
 | 20  | San Blas-Canillejas |
 | 21  | Barajas             |
 
-_Nota_: Los IDs de barrios (neighborhood_id) van del 1 al 218. Consulta el endpoint `/counts` para ver qué barrios tienen contenedores de cada tipo.
+_Nota_: Los IDs de barrios (neighborhood_code) van del 1 al 218. Consulta el endpoint `/counts` para ver qué barrios tienen contenedores de cada tipo.
 
 ## 🎯 Casos de Uso Recomendados
 
@@ -552,7 +552,7 @@ function LiveSearch() {
 
 ### Notas Importantes
 
-1. **`neighborhood_id` puede ser `null`** en algunos registros
+1. **`neighborhood_code` puede ser `null`** en algunos registros
 2. **Campos opcionales** (`load_type`, `subtype`, etc.) pueden ser `null`
 3. **`notes`** contiene información adicional útil para mostrar al usuario
 4. **`bus_stop` e `interurban_node`** solo están presentes en `battery_bins`
@@ -563,13 +563,13 @@ Si necesitas filtrar en el cliente, recuerda que algunos campos son `null`:
 
 ```typescript
 // ✅ Correcto
-const validBins = bins.filter(bin => bin.neighborhood_id !== null);
+const validBins = bins.filter(bin => bin.neighborhood_code !== null);
 
 // ✅ Correcto
 const binsWithNotes = bins.filter(bin => bin.notes && bin.notes.length > 0);
 
 // ❌ Incorrecto (puede causar errores)
-const filtered = bins.filter(bin => bin.neighborhood_id > 0); // Error si es null
+const filtered = bins.filter(bin => bin.neighborhood_code > 0); // Error si es null
 ```
 
 ## 🚀 Rendimiento
@@ -600,8 +600,8 @@ const mockBin: BinRecord = {
   id: 1,
   category_group_id: 1,
   category_id: 14,
-  district_id: 1,
-  neighborhood_id: 5,
+  district_code: 1,
+  neighborhood_code: 5,
   address: "CALLE DEL DESENGAÑO, 16",
   lat: 40.42091,
   lng: -3.70348,
