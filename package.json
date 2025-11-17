@@ -16,7 +16,12 @@
 		"test": "vitest run",
 		"test:cov": "vitest run --coverage",
 		"update-clothing-bins": "tsx src/scripts/updateClothingBins.ts",
-		"import:bins": "tsx src/scripts/importAllBins.ts",
+		"import:all": "tsx src/scripts/import/importAllBinsSequential.ts",
+		"import:clothing": "tsx src/scripts/import/importClothingBins.ts",
+		"import:oil": "tsx src/scripts/import/importOilBins.ts",
+		"import:glass": "tsx src/scripts/import/importGlassBins.ts",
+		"import:battery": "tsx src/scripts/import/importBatteryBins.ts",
+		"import:various": "tsx src/scripts/import/importVariousBins.ts",
 		"prepare": "husky",
 		"check:ci": "biome check",
 		"lint-staged": "lint-staged"

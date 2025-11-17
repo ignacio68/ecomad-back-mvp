@@ -29,8 +29,8 @@ export const binSchema = z.object({
 	id: z.number().int(),
 	category_group_id: z.number().int(),
 	category_id: z.number().int(),
-	district_id: z.number().int(),
-	neighborhood_id: z.number().int().nullable().optional(),
+	district_code: z.string(), // Código del distrito como "01", "02", etc.
+	neighborhood_code: z.string().nullable().optional(), // Código del barrio como "011", "012", etc.
 	address: z.string(),
 	lat: z.number(),
 	lng: z.number(),

@@ -5,7 +5,7 @@
 		"centroid": { "lat": 40.4168, "lng": -3.7038 },
 		"barrios": [
 			{
-				"cod_barrio": "0011",
+				"cod_barrio": "011",
 				"num_bar": "1",
 				"nom_bar": "PALACIO",
 				"centroid": { "lat": 40.4178, "lng": -3.7138 }
@@ -35,7 +35,7 @@
 				"centroid": { "lat": 40.4358, "lng": -3.6638 }
 			},
 			{
-				"cod_barrio": "16",
+				"cod_barrio": "016",
 				"num_bar": "8",
 				"nom_bar": "SOL",
 				"centroid": { "lat": 40.4168, "lng": -3.7038 }
@@ -43,48 +43,48 @@
 		]
 	},
 	{
-		"cod_dis": "2",
+		"cod_dis": "02",
 		"nom_dis": "ARGANZUELA",
 		"centroid": { "lat": 40.3986, "lng": -3.6969 },
 		"barrios": [
 			{
-				"cod_barrio": "21",
+				"cod_barrio": "021",
 				"num_bar": "1",
 				"nom_bar": "IMPERIAL",
 				"centroid": { "lat": 40.4086, "lng": -3.7069 }
 			},
 			{
-				"cod_barrio": "22",
+				"cod_barrio": "022",
 				"num_bar": "2",
 				"nom_bar": "ACACIAS",
 				"centroid": { "lat": 40.3986, "lng": -3.6969 }
 			},
 			{
-				"cod_barrio": "23",
+				"cod_barrio": "023",
 				"num_bar": "3",
 				"nom_bar": "CHOPERA",
 				"centroid": { "lat": 40.3886, "lng": -3.6869 }
 			},
 			{
-				"cod_barrio": "24",
+				"cod_barrio": "024",
 				"num_bar": "4",
 				"nom_bar": "LEGAZPI",
 				"centroid": { "lat": 40.3786, "lng": -3.6769 }
 			},
 			{
-				"cod_barrio": "25",
+				"cod_barrio": "025",
 				"num_bar": "5",
 				"nom_bar": "DELICIAS",
 				"centroid": { "lat": 40.3686, "lng": -3.6669 }
 			},
 			{
-				"cod_barrio": "26",
+				"cod_barrio": "026",
 				"num_bar": "6",
 				"nom_bar": "PALOS DE LA FRONTERA",
 				"centroid": { "lat": 40.3586, "lng": -3.6569 }
 			},
 			{
-				"cod_barrio": "27",
+				"cod_barrio": "027",
 				"num_bar": "7",
 				"nom_bar": "ATOCHA",
 				"centroid": { "lat": 40.3486, "lng": -3.6469 }
@@ -92,42 +92,42 @@
 		]
 	},
 	{
-		"cod_dis": "3",
+		"cod_dis": "03",
 		"nom_dis": "RETIRO",
 		"centroid": { "lat": 40.4153, "lng": -3.6818 },
 		"barrios": [
 			{
-				"cod_barrio": "31",
+				"cod_barrio": "031",
 				"num_bar": "1",
 				"nom_bar": "PACIFICO",
 				"centroid": { "lat": 40.4253, "lng": -3.6918 }
 			},
 			{
-				"cod_barrio": "32",
+				"cod_barrio": "032",
 				"num_bar": "2",
 				"nom_bar": "ADELFAS",
 				"centroid": { "lat": 40.4153, "lng": -3.6818 }
 			},
 			{
-				"cod_barrio": "33",
+				"cod_barrio": "033",
 				"num_bar": "3",
 				"nom_bar": "ESTRELLA",
 				"centroid": { "lat": 40.4053, "lng": -3.6718 }
 			},
 			{
-				"cod_barrio": "34",
+				"cod_barrio": "034",
 				"num_bar": "4",
 				"nom_bar": "IBIZA",
 				"centroid": { "lat": 40.3953, "lng": -3.6618 }
 			},
 			{
-				"cod_barrio": "35",
+				"cod_barrio": "035",
 				"num_bar": "5",
 				"nom_bar": "LOS JERONIMOS",
 				"centroid": { "lat": 40.3853, "lng": -3.6518 }
 			},
 			{
-				"cod_barrio": "36",
+				"cod_barrio": "036",
 				"num_bar": "6",
 				"nom_bar": "NINO JESUS",
 				"centroid": { "lat": 40.3753, "lng": -3.6418 }
@@ -135,42 +135,42 @@
 		]
 	},
 	{
-		"cod_dis": "4",
+		"cod_dis": "04",
 		"nom_dis": "SALAMANCA",
 		"centroid": { "lat": 40.429, "lng": -3.6769 },
 		"barrios": [
 			{
-				"cod_barrio": "41",
+				"cod_barrio": "041",
 				"num_bar": "1",
 				"nom_bar": "RECOLETOS",
 				"centroid": { "lat": 40.439, "lng": -3.6869 }
 			},
 			{
-				"cod_barrio": "42",
+				"cod_barrio": "042",
 				"num_bar": "2",
 				"nom_bar": "GOYA",
 				"centroid": { "lat": 40.429, "lng": -3.6769 }
 			},
 			{
-				"cod_barrio": "43",
+				"cod_barrio": "043",
 				"num_bar": "3",
 				"nom_bar": "FUENTE DEL BERRO",
 				"centroid": { "lat": 40.419, "lng": -3.6669 }
 			},
 			{
-				"cod_barrio": "44",
+				"cod_barrio": "044",
 				"num_bar": "4",
 				"nom_bar": "GUINDALERA",
 				"centroid": { "lat": 40.409, "lng": -3.6569 }
 			},
 			{
-				"cod_barrio": "45",
+				"cod_barrio": "045",
 				"num_bar": "5",
 				"nom_bar": "LISTA",
 				"centroid": { "lat": 40.399, "lng": -3.6469 }
 			},
 			{
-				"cod_barrio": "46",
+				"cod_barrio": "046",
 				"num_bar": "6",
 				"nom_bar": "CASTELLANA",
 				"centroid": { "lat": 40.389, "lng": -3.6369 }
@@ -178,42 +178,42 @@
 		]
 	},
 	{
-		"cod_dis": "5",
+		"cod_dis": "05",
 		"nom_dis": "CHAMARTIN",
 		"centroid": { "lat": 40.4618, "lng": -3.6754 },
 		"barrios": [
 			{
-				"cod_barrio": "51",
+				"cod_barrio": "051",
 				"num_bar": "1",
 				"nom_bar": "EL VISO",
 				"centroid": { "lat": 40.4718, "lng": -3.6854 }
 			},
 			{
-				"cod_barrio": "52",
+				"cod_barrio": "052",
 				"num_bar": "2",
 				"nom_bar": "PROSPERIDAD",
 				"centroid": { "lat": 40.4618, "lng": -3.6754 }
 			},
 			{
-				"cod_barrio": "53",
+				"cod_barrio": "053",
 				"num_bar": "3",
 				"nom_bar": "CIUDAD JARDIN",
 				"centroid": { "lat": 40.4518, "lng": -3.6654 }
 			},
 			{
-				"cod_barrio": "54",
+				"cod_barrio": "054",
 				"num_bar": "4",
 				"nom_bar": "HISPANOAMERICA",
 				"centroid": { "lat": 40.4418, "lng": -3.6554 }
 			},
 			{
-				"cod_barrio": "55",
+				"cod_barrio": "055",
 				"num_bar": "5",
 				"nom_bar": "NUEVA ESPANA",
 				"centroid": { "lat": 40.4318, "lng": -3.6454 }
 			},
 			{
-				"cod_barrio": "56",
+				"cod_barrio": "056",
 				"num_bar": "6",
 				"nom_bar": "CASTILLA",
 				"centroid": { "lat": 40.4218, "lng": -3.6354 }
@@ -221,42 +221,42 @@
 		]
 	},
 	{
-		"cod_dis": "6",
+		"cod_dis": "06",
 		"nom_dis": "TETUAN",
 		"centroid": { "lat": 40.4599, "lng": -3.6976 },
 		"barrios": [
 			{
-				"cod_barrio": "61",
+				"cod_barrio": "061",
 				"num_bar": "1",
 				"nom_bar": "BELLAS VISTAS",
 				"centroid": { "lat": 40.4699, "lng": -3.7076 }
 			},
 			{
-				"cod_barrio": "62",
+				"cod_barrio": "062",
 				"num_bar": "2",
 				"nom_bar": "CUATRO CAMINOS",
 				"centroid": { "lat": 40.4599, "lng": -3.6976 }
 			},
 			{
-				"cod_barrio": "63",
+				"cod_barrio": "063",
 				"num_bar": "3",
 				"nom_bar": "CASTILLEJOS",
 				"centroid": { "lat": 40.4499, "lng": -3.6876 }
 			},
 			{
-				"cod_barrio": "64",
+				"cod_barrio": "064",
 				"num_bar": "4",
 				"nom_bar": "ALMENARA",
 				"centroid": { "lat": 40.4399, "lng": -3.6776 }
 			},
 			{
-				"cod_barrio": "65",
+				"cod_barrio": "065",
 				"num_bar": "5",
 				"nom_bar": "VALDEACEDERAS",
 				"centroid": { "lat": 40.4299, "lng": -3.6676 }
 			},
 			{
-				"cod_barrio": "66",
+				"cod_barrio": "066",
 				"num_bar": "6",
 				"nom_bar": "BERRUGUETE",
 				"centroid": { "lat": 40.4199, "lng": -3.6576 }
@@ -264,42 +264,42 @@
 		]
 	},
 	{
-		"cod_dis": "7",
+		"cod_dis": "07",
 		"nom_dis": "CHAMBERI",
 		"centroid": { "lat": 40.4349, "lng": -3.7038 },
 		"barrios": [
 			{
-				"cod_barrio": "71",
+				"cod_barrio": "071",
 				"num_bar": "1",
 				"nom_bar": "GAZTAMBIDE",
 				"centroid": { "lat": 40.4449, "lng": -3.7138 }
 			},
 			{
-				"cod_barrio": "72",
+				"cod_barrio": "072",
 				"num_bar": "2",
 				"nom_bar": "ARAPILES",
 				"centroid": { "lat": 40.4349, "lng": -3.7038 }
 			},
 			{
-				"cod_barrio": "73",
+				"cod_barrio": "073",
 				"num_bar": "3",
 				"nom_bar": "TRAFALGAR",
 				"centroid": { "lat": 40.4249, "lng": -3.6938 }
 			},
 			{
-				"cod_barrio": "74",
+				"cod_barrio": "074",
 				"num_bar": "4",
 				"nom_bar": "ALMAGRO",
 				"centroid": { "lat": 40.4149, "lng": -3.6838 }
 			},
 			{
-				"cod_barrio": "75",
+				"cod_barrio": "075",
 				"num_bar": "5",
 				"nom_bar": "RIOS ROSAS",
 				"centroid": { "lat": 40.4049, "lng": -3.6738 }
 			},
 			{
-				"cod_barrio": "76",
+				"cod_barrio": "076",
 				"num_bar": "6",
 				"nom_bar": "VALLEHERMOSO",
 				"centroid": { "lat": 40.3949, "lng": -3.6638 }
@@ -307,54 +307,54 @@
 		]
 	},
 	{
-		"cod_dis": "8",
+		"cod_dis": "08",
 		"nom_dis": "FUENCARRAL-EL PARDO",
 		"centroid": { "lat": 40.4876, "lng": -3.7153 },
 		"barrios": [
 			{
-				"cod_barrio": "81",
+				"cod_barrio": "081",
 				"num_bar": "1",
 				"nom_bar": "EL PARDO",
 				"centroid": { "lat": 40.4976, "lng": -3.7253 }
 			},
 			{
-				"cod_barrio": "82",
+				"cod_barrio": "082",
 				"num_bar": "2",
 				"nom_bar": "FUENTELARREINA",
 				"centroid": { "lat": 40.4876, "lng": -3.7153 }
 			},
 			{
-				"cod_barrio": "83",
+				"cod_barrio": "083",
 				"num_bar": "3",
 				"nom_bar": "PENAGRANDE",
 				"centroid": { "lat": 40.4776, "lng": -3.7053 }
 			},
 			{
-				"cod_barrio": "84",
+				"cod_barrio": "084",
 				"num_bar": "4",
 				"nom_bar": "PILAR",
 				"centroid": { "lat": 40.4676, "lng": -3.6953 }
 			},
 			{
-				"cod_barrio": "85",
+				"cod_barrio": "085",
 				"num_bar": "5",
 				"nom_bar": "LA PAZ",
 				"centroid": { "lat": 40.4576, "lng": -3.6853 }
 			},
 			{
-				"cod_barrio": "86",
+				"cod_barrio": "086",
 				"num_bar": "6",
 				"nom_bar": "VALVERDE",
 				"centroid": { "lat": 40.4476, "lng": -3.6753 }
 			},
 			{
-				"cod_barrio": "87",
+				"cod_barrio": "087",
 				"num_bar": "7",
 				"nom_bar": "MIRASIERRA",
 				"centroid": { "lat": 40.4376, "lng": -3.6653 }
 			},
 			{
-				"cod_barrio": "88",
+				"cod_barrio": "088",
 				"num_bar": "8",
 				"nom_bar": "EL GOLOSO",
 				"centroid": { "lat": 40.4276, "lng": -3.6553 }
@@ -362,48 +362,48 @@
 		]
 	},
 	{
-		"cod_dis": "9",
+		"cod_dis": "09",
 		"nom_dis": "MONCLOA-ARAVACA",
 		"centroid": { "lat": 40.435, "lng": -3.7319 },
 		"barrios": [
 			{
-				"cod_barrio": "91",
+				"cod_barrio": "091",
 				"num_bar": "1",
 				"nom_bar": "CASA DE CAMPO",
 				"centroid": { "lat": 40.445, "lng": -3.7419 }
 			},
 			{
-				"cod_barrio": "92",
+				"cod_barrio": "092",
 				"num_bar": "2",
 				"nom_bar": "ARGUELLES",
 				"centroid": { "lat": 40.435, "lng": -3.7319 }
 			},
 			{
-				"cod_barrio": "93",
+				"cod_barrio": "093",
 				"num_bar": "3",
 				"nom_bar": "CIUDAD UNIVERSITARIA",
 				"centroid": { "lat": 40.425, "lng": -3.7219 }
 			},
 			{
-				"cod_barrio": "94",
+				"cod_barrio": "094",
 				"num_bar": "4",
 				"nom_bar": "VALDEZARZA",
 				"centroid": { "lat": 40.415, "lng": -3.7119 }
 			},
 			{
-				"cod_barrio": "95",
+				"cod_barrio": "095",
 				"num_bar": "5",
 				"nom_bar": "VALDEMARIN",
 				"centroid": { "lat": 40.405, "lng": -3.7019 }
 			},
 			{
-				"cod_barrio": "96",
+				"cod_barrio": "096",
 				"num_bar": "6",
 				"nom_bar": "EL PLANTIO",
 				"centroid": { "lat": 40.395, "lng": -3.6919 }
 			},
 			{
-				"cod_barrio": "97",
+				"cod_barrio": "097",
 				"num_bar": "7",
 				"nom_bar": "ARAVACA",
 				"centroid": { "lat": 40.385, "lng": -3.6819 }
