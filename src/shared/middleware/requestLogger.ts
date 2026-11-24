@@ -5,6 +5,7 @@ import pino from "pino";
 import pinoHttp from "pino-http";
 
 import { env } from "@/shared/utils/envConfig";
+import { pathWithoutQuery } from "@/shared/utils/pathWithoutQuery";
 
 const logger = pino({
 	level: env.isProduction ? "info" : "debug",
@@ -32,13 +33,13 @@ const httpLogger = pinoHttp({
 	logger,
 	genReqId: (req) => req.headers["x-request-id"] as string,
 	customLogLevel: (_req, res) => getLogLevel(res.statusCode),
-	customSuccessMessage: (req) => `${req.method} ${req.url} completed`,
+	customSuccessMessage: (req) => `${req.method} ${pathWithoutQuery(req.url)} completed`,
 	customErrorMessage: (_req, res) => `Request failed with status code: ${res.statusCode}`,
 	// Only log response bodies in development
 	serializers: {
 		req: (req) => ({
 			method: req.method,
-			url: req.url,
+			url: pathWithoutQuery(req.url),
 			id: req.id,
 		}),
 	},
