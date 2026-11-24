@@ -11,6 +11,9 @@ const logger = pino({
 	transport: env.isProduction ? undefined : { target: "pino-pretty" },
 });
 
+// Query strings can carry user coordinates (/nearby?lat=&lng=); never log them.
+export const pathWithoutQuery = (url = "") => url.split("?")[0];
+
 const getLogLevel = (status: number) => {
 	if (status >= StatusCodes.INTERNAL_SERVER_ERROR) return "error";
 	if (status >= StatusCodes.BAD_REQUEST) return "warn";
@@ -32,13 +35,13 @@ const httpLogger = pinoHttp({
 	logger,
 	genReqId: (req) => req.headers["x-request-id"] as string,
 	customLogLevel: (_req, res) => getLogLevel(res.statusCode),
-	customSuccessMessage: (req) => `${req.method} ${req.url} completed`,
+	customSuccessMessage: (req) => `${req.method} ${pathWithoutQuery(req.url)} completed`,
 	customErrorMessage: (_req, res) => `Request failed with status code: ${res.statusCode}`,
 	// Only log response bodies in development
 	serializers: {
 		req: (req) => ({
 			method: req.method,
-			url: req.url,
+			url: pathWithoutQuery(req.url),
 			id: req.id,
 		}),
 	},
