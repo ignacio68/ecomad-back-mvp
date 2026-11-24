@@ -5,14 +5,12 @@ import pino from "pino";
 import pinoHttp from "pino-http";
 
 import { env } from "@/shared/utils/envConfig";
+import { pathWithoutQuery } from "@/shared/utils/pathWithoutQuery";
 
 const logger = pino({
 	level: env.isProduction ? "info" : "debug",
 	transport: env.isProduction ? undefined : { target: "pino-pretty" },
 });
-
-// Query strings can carry user coordinates (/nearby?lat=&lng=); never log them.
-export const pathWithoutQuery = (url = "") => url.split("?")[0];
 
 const getLogLevel = (status: number) => {
 	if (status >= StatusCodes.INTERNAL_SERVER_ERROR) return "error";

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { pathWithoutQuery } from "../requestLogger";
+import { pathWithoutQuery } from "../pathWithoutQuery";
 
 describe("pathWithoutQuery", () => {
 	it("drops the query string so coordinates are never logged", () => {
